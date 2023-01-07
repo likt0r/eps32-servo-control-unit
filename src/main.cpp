@@ -5,7 +5,7 @@
 #include <ESPAsyncWebServer.h>
 #include <string>
 #include <Wire.h>
-
+#include "SPIFFS.h"
 #include <Adafruit_PWMServoDriver.h>
 
 
@@ -25,7 +25,7 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 // have!
 // Watch video V1 to understand the two lines below: http://youtu.be/y8X9X10Tn1k
 #define SERVOMIN  125 // this is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  575 // this is the 'maximum' pulse length count (out of 4096)
+#define SERVOMAX  600 // this is the 'maximum' pulse length count (out of 4096)
 
 // Webinterface
 
@@ -124,10 +124,22 @@ digitalWrite(13, LOW);
   // Print ESP Local IP Address
   Serial.println(WiFi.localIP());
 
+   // Initialize SPIFFS
+  if(!SPIFFS.begin()){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
+    Serial.println("get /");
+    request->send(SPIFFS, "/index.html", String(), false, processor);
   });
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+    Serial.println("get /favicon.ico");
+    request->send(SPIFFS, "/favicon.ico", String(), false, processor);
+  });
+
 
   // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
   server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
@@ -176,13 +188,13 @@ int angleToPulse(int ang){
 void loop() {
 
 
-    for( int angle =0; angle<512; angle +=1){
-      for(int i=0; i<16; i++)
-        {      
-            board1.setPWM(i, 0, angleToPulse(angle) );
-        }
-      delay(10);
-    }
+    // for( int angle =0; angle<300; angle +=1){
+    //   for(int i=0; i<16; i++)
+    //     {      
+    //         board1.setPWM(i, 0, angleToPulse(angle) );
+    //     }
+    //   delay(10);
+    // }
   
 // robojax PCA9865 16 channel Servo control
   delay(500);
