@@ -10,8 +10,8 @@
 #include "FrontendFiles.h"
 
 // Setting network credentials
-const char *ssid = "ALM4OG_RPT";
-const char *password = "domn8udomn8u2domn8u3";
+const char *ssid = "Sauf-Lan";
+const char *password = "gpun94$_/W";
 
 // Servorboard
 // called this way, it uses the default address 0x40
@@ -101,14 +101,14 @@ void setup()
               {
     Serial.println("get /");
     request->send(SPIFFS, "/index.html", "text/html", false); });
-    //   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
-    //     Serial.println("get /favicon.ico");
-    //     request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false);
-    //   });
-    //   server.on("/assets/logo-da9b9095.svg", HTTP_GET, [](AsyncWebServerRequest *request){
-    //     Serial.println("get /favicon.ico");
-    //     request->send(SPIFFS, "/assets_logo-da9b9095.svg", "image/svg+xml", false);
-    //   });
+      server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+        Serial.println("get /favicon.ico");
+        request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false);
+      });
+      server.on("/assets/logo-da9b9095.svg", HTTP_GET, [](AsyncWebServerRequest *request){
+        Serial.println("get /favicon.ico");
+        request->send(SPIFFS, "/assets_logo-da9b9095.svg", "image/svg+xml", false);
+      });
 
     // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
     server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -150,23 +150,23 @@ void setup()
 int angleToPulse(int ang)
 {
     int pulse = map(ang, 0, 180, SERVOMIN, SERVOMAX); // map angle of 0 to 180 to Servo min and Servo max
-    Serial.print("Angle: ");
-    Serial.print(ang);
-    Serial.print(" pulse: ");
-    Serial.println(pulse);
+    // Serial.print("Angle: ");
+    // Serial.print(ang);
+    // Serial.print(" pulse: ");
+    // Serial.println(pulse);
     return pulse;
 }
 
 void loop()
 {
 
-    // for( int angle =0; angle<300; angle +=1){
-    //   for(int i=0; i<16; i++)
-    //     {
-    //         board1.setPWM(i, 0, angleToPulse(angle) );
-    //     }
-    //   delay(10);
-    // }
+    for( int angle =0; angle<300; angle +=1){
+      for(int i=0; i<16; i++)
+        {
+            board1.setPWM(i, 0, angleToPulse(angle) );
+        }
+      delay(10);
+    }
 
     // robojax PCA9865 16 channel Servo control
     delay(500);
