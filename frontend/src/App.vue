@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
 import { ref } from 'vue'
+import SideNavigation from "./components/SideNavigation.vue";
 
 const theme = ref('light')
 const drawer = ref(false)
+const navigationPoints = ref([{title: "default", icon: "home", to: "/"}])
+
 function onClick () {
   theme.value = theme.value === 'light' ? 'dark' : 'light'
 }
@@ -33,11 +36,8 @@ function onDrawerClick () {
       >Toggle Theme</v-btn>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer">
-        <nav>
-        <RouterLink to="/">Home !!</RouterLink>
-        <RouterLink to="/about">About !!!</RouterLink>
-      </nav>
-    </v-navigation-drawer>
+        <SideNavigation :nav-points="navigationPoints" />
+        </v-navigation-drawer>
     <v-main>
         <RouterView />
 
