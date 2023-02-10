@@ -16,14 +16,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
   <v-list dense nav>
-    <v-list-item v-for="item in props.navPoints" :key="item.title" link>
-      <v-list-item-icon>
-        <v-icon>{{ item.icon }}</v-icon>
-      </v-list-item-icon>
+    <v-list-item
+      v-for="item in props.navPoints"
+      :key="item.title"
+      link
+      :to="item.to"
+    >
+      <template v-slot:prepend>
+        <v-icon :icon="item.icon"></v-icon>
+      </template>
 
-      <v-list-item-content>
+
         <v-list-item-title>{{ item.title }}</v-list-item-title>
-      </v-list-item-content>
+
     </v-list-item>
   </v-list>
 </template>

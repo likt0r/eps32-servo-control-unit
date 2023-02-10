@@ -1,25 +1,20 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+/**
+ * main.ts
+ *
+ * Bootstraps Vuetify and other plugins then mounts the App`
+ */
 
-// Vuetify
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-
+// Components
 import App from './App.vue'
-import router from './router'
-import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
-const vuetify = createVuetify({
-    components,
-    directives,
-  })
+// Composables
+import { createApp } from 'vue'
+
+// Plugins
+import { registerPlugins } from '@/plugins'
 
 const app = createApp(App)
 
-app.use(createPinia())
-app.use(router)
-app.use(vuetify)
+registerPlugins(app)
+
 app.mount('#app')
