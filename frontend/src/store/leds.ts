@@ -2,48 +2,48 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 export interface Led {
-    id: number;
-    pin: number;
-    on: boolean;
-    pwm: number;
+  id: number;
+  pin: number;
+  isOn: boolean;
+  pwm: number;
 }
-export const useAppStore = defineStore("leds", () => {
-  const drawerVisible = ref<Led[]>([{
-    id:1,
-    pin: 13,
-    on: false,
-    pwm: 0,
-  },{
-    id:2,
-    pin: 14,
-    on: false,
-    pwm: 0,
-  }]);
-  const isDarkMode = ref(false);
+export const useLedStore = defineStore("leds", () => {
+  const leds = ref<Led[]>([
+    {
+      id: 1,
+      pin: 13,
+      isOn: false,
+      pwm: 0,
+    },
+    {
+      id: 2,
+      pin: 14,
+      isOn: false,
+      pwm: 0,
+    },
+  ]);
+  function toggleLed(idx: number) {
+    const element = leds.value.find((led) => {
+      return idx === led.id;
+    });
+    if (element) {
+      element.isOn = !element.isOn;
+    }
+  }
+  function setLed(idx: number, isOn: boolean) {
+    const element = leds.value.find((led) => {
+      return idx === led.id;
+    });
+    if (element) {
+      element.isOn = isOn;
+    }
+  }
 
-  const theme = computed(() => (isDarkMode.value ? "dark" : "light"));
-
-  function setDarkMode(value: boolean) {
-    isDarkMode.value = value;
-  }
-  function setDrawer(value: boolean) {
-    drawerVisible.value = value;
-  }
-  function toggleDrawer() {
-    drawerVisible.value = !drawerVisible.value;
-  }
-  function toggleDarkMode() {
-    isDarkMode.value = !isDarkMode.value;
-  }
   return {
-    drawerVisible,
-    isDarkMode,
-    theme,
-    setDarkMode,
-    setDrawer,
-    toggleDrawer,
-    toggleDarkMode,
+    leds,
+    toggleLed,
+    setLed,
   };
 });
 
-export default useAppStore;
+export default useLedStore;
