@@ -12,6 +12,7 @@
     "@babel/types": "^7.20.7",
     "@mdi/font": "7.0.96",
     "core-js": "^3.8.3",
+    "mime-types": "^2.1.35",
     "pinia": "^2.0.23",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
