@@ -7,7 +7,7 @@ const buildFolder = "dist";
 const dataFolder = "../data";
 const libFolder = "../lib/frontend-files";
 // read build folder recursively and get all files
-async function walk(dir) {
+async function walk(dir: string) {
   const entries = await fs.readdir(dir);
   let ret: string[] = [];
   for (const entry of entries) {
