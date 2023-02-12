@@ -10,8 +10,10 @@
 #include "FrontendFiles.h"
 
 // Setting network credentials
-const char *ssid = "Sauf-Lan";
-const char *password = "gpun94$_/W";
+// const char *ssid = "Sauf-Lan";
+// const char *password = "gpun94$_/W";
+const char *ssid = "Karl-Fritz";
+const char *password = "24333800157909807591";
 
 // Servorboard
 // called this way, it uses the default address 0x40
@@ -101,14 +103,14 @@ void setup()
               {
     Serial.println("get /");
     request->send(SPIFFS, "/index.html", "text/html", false); });
-      server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request)
+              {
         Serial.println("get /favicon.ico");
-        request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false);
-      });
-      server.on("/assets/logo-da9b9095.svg", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false); });
+    server.on("/assets/logo-da9b9095.svg", HTTP_GET, [](AsyncWebServerRequest *request)
+              {
         Serial.println("get /favicon.ico");
-        request->send(SPIFFS, "/assets_logo-da9b9095.svg", "image/svg+xml", false);
-      });
+        request->send(SPIFFS, "/assets_logo-da9b9095.svg", "image/svg+xml", false); });
 
     // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
     server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -160,12 +162,13 @@ int angleToPulse(int ang)
 void loop()
 {
 
-    for( int angle =0; angle<300; angle +=1){
-      for(int i=0; i<16; i++)
+    for (int angle = 0; angle < 300; angle += 1)
+    {
+        for (int i = 0; i < 16; i++)
         {
-            board1.setPWM(i, 0, angleToPulse(angle) );
+            board1.setPWM(i, 0, angleToPulse(angle));
         }
-      delay(10);
+        delay(10);
     }
 
     // robojax PCA9865 16 channel Servo control
