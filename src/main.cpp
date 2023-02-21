@@ -1,13 +1,16 @@
 #include <Arduino.h>
 // Importing necessary libraries
-#include <WiFi.h>
+#include <Adafruit_PWMServoDriver.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <string>
+#include <WiFi.h>
 #include <Wire.h>
-#include "SPIFFS.h"
-#include <Adafruit_PWMServoDriver.h>
+
+#include <string>
+
 #include "FrontendFiles.h"
+#include "SPIFFS.h"
+#include "outputs.h"
 
 // Setting network credentials
 // const char *ssid = "Sauf-Lan";
@@ -24,8 +27,8 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 // for max range. You'll have to tweak them as necessary to match the servos you
 // have!
 // Watch video V1 to understand the two lines below: http://youtu.be/y8X9X10Tn1k
-#define SERVOMIN 125 // this is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX 600 // this is the 'maximum' pulse length count (out of 4096)
+#define SERVOMIN 125  // this is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX 600  // this is the 'maximum' pulse length count (out of 4096)
 
 // Webinterface
 
@@ -38,109 +41,124 @@ const int LED3 = 17;
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
 
-String outputState(int output)
-{
-    if (digitalRead(output))
-    {
-        return "checked";
-    }
-    else
-    {
-        return "";
-    }
+String outputState(int output) {
+   if (digitalRead(output)) {
+      return "checked";
+   } else {
+      return "";
+   }
 }
 
 // Replaces placeholder with button section in your web page
 
-void setup()
-{
-    // Serial port for debugging purposes
-    Serial.begin(115200);
+void setup() {
+   // Serial port for debugging purposes
+   Serial.begin(115200);
+   for (const auto &led : outputs.leds) {
+      // Serial.print("Led id: ");
+      // Serial.println(led.id);
+      // Serial.print("Led status: ");
+      // Serial.println(led.isOn ? "On" : "Off");
+      // Serial.print("Led pin: ");
+      // Serial.println(led.pin);
+      pinMode(led.pin, OUTPUT);
+      digitalWrite(led.pin, led.isOn ? HIGH : LOW);
+   }
 
-    pinMode(LED1, OUTPUT);
-    digitalWrite(LED1, LOW);
-    pinMode(LED2, OUTPUT);
-    digitalWrite(LED2, LOW);
-    pinMode(LED3, OUTPUT);
-    digitalWrite(LED3, LOW);
-    pinMode(13, OUTPUT);
-    digitalWrite(13, LOW);
+   // Connect to Wi-Fi
+   WiFi.begin(ssid, password);
+   while (WiFi.status() != WL_CONNECTED) {
+      delay(1000);
+      Serial.println("Connecting to WiFi");
+   }
 
-    // Connect to Wi-Fi
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(1000);
-        Serial.println("Connecting to WiFi");
-    }
+   // Print ESP Local IP Address
+   Serial.println(WiFi.localIP());
 
-    // Print ESP Local IP Address
-    Serial.println(WiFi.localIP());
+   // Initialize SPIFFS
+   if (!SPIFFS.begin()) {
+      Serial.println("An Error has occurred while mounting SPIFFS");
+      return;
+   }
+   // iterate of frontendFiles
+   for (int i = 0; i < frontendFilesCount; i++) {
+      // open file for writing
+      // Serial.println("set route on ");
+      // Serial.println(frontendFileInfos[i].url.c_str());
+      // Serial.println(frontendFileInfos[i].filepath.c_str());
+      // Serial.println(frontendFileInfos[i].mimeType.c_str());
+      const FrontendFileInfo fileInfo = frontendFileInfos[i];
+      server.on(frontendFileInfos[i].url.c_str(), HTTP_GET,
+                [fileInfo](AsyncWebServerRequest *request) {
+                   Serial.println("get /");
+                   request->send(SPIFFS, fileInfo.filepath.c_str(),
+                                 fileInfo.mimeType.c_str(), false);
+                });
+   }
 
-    // Initialize SPIFFS
-    if (!SPIFFS.begin())
-    {
-        Serial.println("An Error has occurred while mounting SPIFFS");
-        return;
-    }
-    // iterate of frontendFiles
-    for (int i = 0; i < frontendFilesCount; i++)
-    {
-        // open file for writing
-        Serial.println("set route on ");
-        Serial.println(frontendFileInfos[i].url.c_str());
-        Serial.println(frontendFileInfos[i].filepath.c_str());
-        Serial.println(frontendFileInfos[i].mimeType.c_str());
-        const FrontendFileInfo fileInfo = frontendFileInfos[i];
-        server.on(frontendFileInfos[i].url.c_str(), HTTP_GET, [fileInfo](AsyncWebServerRequest *request)
-                  {
-            Serial.println("get /");
-            request->send(SPIFFS, fileInfo.filepath.c_str(), fileInfo.mimeType.c_str(), false); });
-    }
+   // Route for root / web page
+   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Serial.println("get /");
+      request->send(SPIFFS, "/index.html", "text/html", false);
+   });
+   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Serial.println("get /favicon.ico");
+      request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false);
+   });
+   server.on("/assets/logo-da9b9095.svg", HTTP_GET,
+             [](AsyncWebServerRequest *request) {
+                Serial.println("get /favicon.ico");
+                request->send(SPIFFS, "/assets_logo-da9b9095.svg",
+                              "image/svg+xml", false);
+             });
 
-    // Route for root / web page
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-    Serial.println("get /");
-    request->send(SPIFFS, "/index.html", "text/html", false); });
-    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        Serial.println("get /favicon.ico");
-        request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false); });
-    server.on("/assets/logo-da9b9095.svg", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        Serial.println("get /favicon.ico");
-        request->send(SPIFFS, "/assets_logo-da9b9095.svg", "image/svg+xml", false); });
+   server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Serial.println("/api/status");
+      request->send(200, "application/json", outputToJson());
+   });
 
-    // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
-    server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-    String inputMessage1;
-    String inputMessage2;
-    // GET input1 value on <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
-    if (request->hasParam(input_parameter1) && request->hasParam(input_parameter2)) {
-      inputMessage1 = request->getParam(input_parameter1)->value();
-      inputMessage2 = request->getParam(input_parameter2)->value();
-      digitalWrite(inputMessage1.toInt(), inputMessage2.toInt());
-    }
-    else {
-      inputMessage1 = "No message sent";
-      inputMessage2 = "No message sent";
-    }
-    Serial.print("GPIO: ");
-    Serial.print(inputMessage1);
-    Serial.print(" - Set to: ");
-    Serial.println(inputMessage2);
-    request->send(200, "text/plain", "OK"); });
+   //    server.on("/api/led", HTTP_GET, [](AsyncWebServerRequest *request) {
+   //       request->send(200, "application/json", outputToJson());
+   //    });
+   server.on("/api/led", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/plain", "");
+   });
 
-    // Start server
-    server.begin();
+   server.addHandler(new AsyncCallbackJsonWebHandler(
+       "/api/led", [](AsyncWebServerRequest *request, JsonVariant &json) {
+          Serial.print("/api/led");
+          JsonObject const &jsonObj = json.as<JsonObject>();
+          int id = jsonObj["id"];
+          bool isOn = jsonObj["isOn"];
+          bool hasLed = outputs.setLedStatusById(id, isOn);
 
-    // Servo Stuff
-    Serial.println("32 channel Servo test!");
+          if (hasLed) {
+             digitalWrite(outputs.getLedPin(id), isOn ? HIGH : LOW);
+             request->send(200, "application/json", "{\"success\":true}");
 
-    board1.begin();
-    board1.setPWMFreq(60); // Analog servos run at ~60 Hz updates
+          } else {
+             request->send(400, "application/json",
+                           "{\"error\":\"Led not found\"}");
+          }
+
+          // ...
+       }));
+
+   // Set Headers
+   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods",
+                                        "GET,PUT,POST,DELETE,OPTIONS");
+   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers",
+                                        "Content-Type");
+
+   // Start server
+   server.begin();
+
+   // Servo Stuff
+   Serial.println("32 channel Servo test!");
+   outputs.print();
+   board1.begin();
+   board1.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 }
 
 /*
@@ -149,28 +167,25 @@ void setup()
  * also prints the value on seial monitor
  * written by Ahmad Nejrabi for Robojax, Robojax.com
  */
-int angleToPulse(int ang)
-{
-    int pulse = map(ang, 0, 180, SERVOMIN, SERVOMAX); // map angle of 0 to 180 to Servo min and Servo max
-    // Serial.print("Angle: ");
-    // Serial.print(ang);
-    // Serial.print(" pulse: ");
-    // Serial.println(pulse);
-    return pulse;
+int angleToPulse(int ang) {
+   int pulse =
+       map(ang, 0, 180, SERVOMIN,
+           SERVOMAX);  // map angle of 0 to 180 to Servo min and Servo max
+   // Serial.print("Angle: ");
+   // Serial.print(ang);
+   // Serial.print(" pulse: ");
+   // Serial.println(pulse);
+   return pulse;
 }
 
-void loop()
-{
+void loop() {
+   for (int angle = 0; angle < 300; angle += 1) {
+      for (int i = 0; i < 16; i++) {
+         board1.setPWM(i, 0, angleToPulse(angle));
+      }
+      delay(10);
+   }
 
-    for (int angle = 0; angle < 300; angle += 1)
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            board1.setPWM(i, 0, angleToPulse(angle));
-        }
-        delay(10);
-    }
-
-    // robojax PCA9865 16 channel Servo control
-    delay(500);
+   // robojax PCA9865 16 channel Servo control
+   delay(500);
 }

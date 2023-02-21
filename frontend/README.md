@@ -52,6 +52,12 @@ npm run lint
 pnpm lint
 ```
 
-### Customize configuration
+## Setup dev environment
 
-See [Configuration Reference](https://vitejs.dev/config/).
+create a .env.development with following content
+
+```bash
+# to set the ip address of your running esp board for frontend development
+VITE_APP_API_BASE_URL=http://192.168.1.133/
+
+```
