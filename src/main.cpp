@@ -8,11 +8,14 @@
 #include <WiFi.h>
 #include <Wire.h>
 
+#include <algorithm>
 #include <string>
 
 #include "FrontendFiles.h"
 #include "SPIFFS.h"
+#include "api.h"
 #include "motion/motion.h"
+#include "motion/remote.h"
 #include "outputs.h"
 
 // Setting network credentials
@@ -40,7 +43,6 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 #define SERVO_MIN_ANGLE 0
 #define SERVO_MAX_ANGLE 180
 #define SERVO_FREQ 60  // Analog servos run at ~60 Hz updates
-
 std::vector<LedState> leds = {{1, false, 16}, {2, false, 19}, {3, false, 15}};
 std::vector<ServoState> servos = {{1, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE},
@@ -48,6 +50,8 @@ std::vector<ServoState> servos = {{1, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE}};
 
 Outputs outputs = {leds, servos};
+
+RemoteControlTarget remoteControlTarget = {0.2f, {{1, 0.0f}, {2, 0.0f}}};
 
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
@@ -62,7 +66,7 @@ String outputState(int output) {
 
 /** Motion State Variables **/
 MotionMode motionMode = STARTUP;
-float remoteControlledMotionSpeed = 0.2;  // degrees per 10 ms
+int startupCounter = 0;
 /** Hardware timer for 100 Hz servo update frequency*/
 hw_timer_t *timer = NULL;
 
@@ -70,18 +74,30 @@ void IRAM_ATTR motorLoopISR() {
    switch (motionMode) {
       // Move servos to start position
       case STARTUP:
-         for (auto &servo : outputs.servos) {
-            int pwm = map(servo.position, servo.minAngle, servo.maxAngle,
-                          servo.minPwm, servo.maxPwm);
-            ledcWrite(servo.id, pwm);
-         }
-         delay(2000);
-         motionMode = IDLE;
+         startupCounter++;  // wait for 2 seconds before starting
+         if (startupCounter > 200) motionMode = IDLE;
          break;
       case IDLE:
          // do nothing
          break;
       case REMOTE_CONTROL:
+         float speed = remoteControlTarget.speed;
+         for (const auto &pos : remoteControlTarget.positions) {
+            int id = pos.id;
+            auto it =
+                std::find_if(outputs.servos.begin(), outputs.servos.end(),
+                             [&](const ServoState &s) { return s.id == id; });
+            if (it != outputs.servos.end()) {
+               float currentPos = it->position;
+               float targetPos = pos.position;
+               float gradient = targetPos - currentPos;
+               gradient = std::max(-speed, std::min(speed, gradient));  // limit
+               it->position += gradient;
+               it->position = std::max((float)it->minAngle,
+                                       std::min((float)it->maxAngle,
+                                                it->position));  // limit servo
+            }
+         }
          break;
    }
 
@@ -126,11 +142,6 @@ void setup() {
    }
    // iterate of frontendFiles
    for (int i = 0; i < frontendFilesCount; i++) {
-      // open file for writing
-      // Serial.println("set route on ");
-      // Serial.println(frontendFileInfos[i].url.c_str());
-      // Serial.println(frontendFileInfos[i].filepath.c_str());
-      // Serial.println(frontendFileInfos[i].mimeType.c_str());
       const FrontendFileInfo fileInfo = frontendFileInfos[i];
       server.on(frontendFileInfos[i].url.c_str(), HTTP_GET,
                 [fileInfo](AsyncWebServerRequest *request) {
@@ -155,39 +166,7 @@ void setup() {
                 request->send(SPIFFS, "/assets_logo-da9b9095.svg",
                               "image/svg+xml", false);
              });
-
-   server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest *request) {
-      Serial.println("/api/status");
-      request->send(200, "application/json", outputs.outputToJson());
-   });
-
-   //    server.on("/api/led", HTTP_GET, [](AsyncWebServerRequest *request) {
-   //       request->send(200, "application/json", outputToJson());
-   //    });
-   server.on("/api/led", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
-      request->send(200, "text/plain", "");
-   });
-
-   server.addHandler(new AsyncCallbackJsonWebHandler(
-       "/api/led", [](AsyncWebServerRequest *request, JsonVariant &json) {
-          Serial.print("/api/led");
-          JsonObject const &jsonObj = json.as<JsonObject>();
-          int id = jsonObj["id"];
-          bool isOn = jsonObj["isOn"];
-          bool hasLed = outputs.setLedStatusById(id, isOn);
-
-          if (hasLed) {
-             digitalWrite(outputs.getLedPin(id), isOn ? HIGH : LOW);
-             request->send(200, "application/json", "{\"success\":true}");
-
-          } else {
-             request->send(400, "application/json",
-                           "{\"error\":\"Led not found\"}");
-          }
-
-          // ...
-       }));
-
+   setupApi(&server, &outputs, &remoteControlTarget, &motionMode);
    // Set Headers
    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods",
@@ -207,8 +186,8 @@ void setup() {
    // Start Hardware Timer loop
    pinMode(14, OUTPUT);              // Set loop debug pin as output
    timer = timerBegin(0, 80, true);  // Timer 0, Prescaler 80, Count up
-   timerAttachInterrupt(timer, &motorLoopISR, true);  // Attach the ISR function
-   timerAlarmWrite(timer, 10000, true);               // 100 Hz, Repeat
+   timerAttachInterrupt(timer, &motorLoopISR, true);  // Attach the ISR
+   timerAlarmWrite(timer, 10000, true);               // 100 Hz,
    timerAlarmEnable(timer);
 }
 

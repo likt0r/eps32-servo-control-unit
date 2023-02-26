@@ -27,6 +27,7 @@ struct Outputs {
    std::vector<ServoState> servos;
    bool setLedStatusById(int id, bool isOn);
    int getLedPin(int id);
+   bool setServoPositionById(int id, float position);
    void print();
    String outputToJson();
 };

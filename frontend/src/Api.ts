@@ -17,10 +17,9 @@ const servoCodec = t.type({
    id: t.number,
    angle: t.number,
    speed: t.number,
-   pin: t.UnionType t.number | t.undefined,
-   address: t.number | t.undefined,
+   pin: t.union([t.number, t.undefined]),
+   address: t.union([t.number, t.undefined]),
 });
-
 
 export type Led = t.TypeOf<typeof ledCodec>;
 

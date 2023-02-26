@@ -15,6 +15,17 @@ bool Outputs::setLedStatusById(int id, bool isOn) {
    }
    return false;
 };
+
+bool Outputs::setServoPositionById(int id, float position) {
+   for (auto &servo : servos) {
+      if (servo.id == id) {
+         servo.position = position;
+         return true;
+      }
+   }
+   return false;
+};
+
 int Outputs::getLedPin(int id) {
    for (auto &led : leds) {
       if (led.id == id) {
