@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <esp32-hal-gpio.h>
+#include <esp32-hal-timer.h>
 // Importing necessary libraries
 #include <Adafruit_PWMServoDriver.h>
 #include <AsyncTCP.h>
@@ -10,6 +12,7 @@
 
 #include "FrontendFiles.h"
 #include "SPIFFS.h"
+#include "motion/motion.h"
 #include "outputs.h"
 
 // Setting network credentials
@@ -27,17 +30,25 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 // for max range. You'll have to tweak them as necessary to match the servos you
 // have!
 // Watch video V1 to understand the two lines below: http://youtu.be/y8X9X10Tn1k
-#define SERVOMIN 125  // this is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX 600  // this is the 'maximum' pulse length count (out of 4096)
 
-// Webinterface
+// Global State  Variables
 
-const char *input_parameter1 = "output";
-const char *input_parameter2 = "state";
+#define SERVO_PWM_MIN \
+   80  // this is the 'minimum' pulse length count (out of 4096)
+#define SERVO_PWM_MAX \
+   620  // this is the 'maximum' pulse length count (out of 4096)
+#define SERVO_MIN_ANGLE 0
+#define SERVO_MAX_ANGLE 180
+#define SERVO_FREQ 60  // Analog servos run at ~60 Hz updates
 
-const int LED1 = 4;
-const int LED2 = 16;
-const int LED3 = 17;
+std::vector<LedState> leds = {{1, false, 16}, {2, false, 19}, {3, false, 15}};
+std::vector<ServoState> servos = {{1, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
+                                   SERVO_MIN_ANGLE, SERVO_MAX_ANGLE},
+                                  {2, 13, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
+                                   SERVO_MIN_ANGLE, SERVO_MAX_ANGLE}};
+
+Outputs outputs = {leds, servos};
+
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
 
@@ -49,20 +60,53 @@ String outputState(int output) {
    }
 }
 
-// Replaces placeholder with button section in your web page
+/** Motion State Variables **/
+MotionMode motionMode = STARTUP;
+float remoteControlledMotionSpeed = 0.2;  // degrees per 10 ms
+/** Hardware timer for 100 Hz servo update frequency*/
+hw_timer_t *timer = NULL;
+
+void IRAM_ATTR motorLoopISR() {
+   switch (motionMode) {
+      // Move servos to start position
+      case STARTUP:
+         for (auto &servo : outputs.servos) {
+            int pwm = map(servo.position, servo.minAngle, servo.maxAngle,
+                          servo.minPwm, servo.maxPwm);
+            ledcWrite(servo.id, pwm);
+         }
+         delay(2000);
+         motionMode = IDLE;
+         break;
+      case IDLE:
+         // do nothing
+         break;
+      case REMOTE_CONTROL:
+         break;
+   }
+
+   // Calculate new servo positions
+
+   for (auto &servo : outputs.servos) {
+      int pwm = map(servo.position, servo.minAngle, servo.maxAngle,
+                    servo.minPwm, servo.maxPwm);
+      ledcWrite(servo.id, pwm);
+   }
+}
 
 void setup() {
    // Serial port for debugging purposes
    Serial.begin(115200);
    for (const auto &led : outputs.leds) {
-      // Serial.print("Led id: ");
-      // Serial.println(led.id);
-      // Serial.print("Led status: ");
-      // Serial.println(led.isOn ? "On" : "Off");
-      // Serial.print("Led pin: ");
-      // Serial.println(led.pin);
       pinMode(led.pin, OUTPUT);
       digitalWrite(led.pin, led.isOn ? HIGH : LOW);
+   }
+
+   // setup servos
+   for (auto &servo : outputs.servos) {
+      pinMode(servo.pin, OUTPUT);
+      ledcSetup(servo.id, 50, 12);  // configure PWM frequency and resolution
+      ledcAttachPin(servo.pin, servo.id);
    }
 
    // Connect to Wi-Fi
@@ -114,7 +158,7 @@ void setup() {
 
    server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest *request) {
       Serial.println("/api/status");
-      request->send(200, "application/json", outputToJson());
+      request->send(200, "application/json", outputs.outputToJson());
    });
 
    //    server.on("/api/led", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -159,33 +203,25 @@ void setup() {
    outputs.print();
    board1.begin();
    board1.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+
+   // Start Hardware Timer loop
+   pinMode(14, OUTPUT);              // Set loop debug pin as output
+   timer = timerBegin(0, 80, true);  // Timer 0, Prescaler 80, Count up
+   timerAttachInterrupt(timer, &motorLoopISR, true);  // Attach the ISR function
+   timerAlarmWrite(timer, 10000, true);               // 100 Hz, Repeat
+   timerAlarmEnable(timer);
 }
 
-/*
- * angleToPulse(int ang)
- * gets angle in degree and returns the pulse width
- * also prints the value on seial monitor
- * written by Ahmad Nejrabi for Robojax, Robojax.com
- */
-int angleToPulse(int ang) {
-   int pulse =
-       map(ang, 0, 180, SERVOMIN,
-           SERVOMAX);  // map angle of 0 to 180 to Servo min and Servo max
-   // Serial.print("Angle: ");
-   // Serial.print(ang);
-   // Serial.print(" pulse: ");
-   // Serial.println(pulse);
-   return pulse;
-}
+// Enable the timer
 
 void loop() {
-   for (int angle = 0; angle < 300; angle += 1) {
-      for (int i = 0; i < 16; i++) {
-         board1.setPWM(i, 0, angleToPulse(angle));
-      }
-      delay(10);
-   }
+   //    for (int angle = 0; angle < 300; angle += 1) {
+   //       for (int i = 0; i < 16; i++) {
+   //          board1.setPWM(i, 0, angleToPulse(angle));
+   //       }
+   //       delay(10);
+   //    }
 
-   // robojax PCA9865 16 channel Servo control
+   //    // robojax PCA9865 16 channel Servo control
    delay(500);
 }

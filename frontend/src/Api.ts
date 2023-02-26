@@ -12,6 +12,16 @@ const ledCodec = t.type({
    isOn: t.boolean,
    pin: t.number,
 });
+
+const servoCodec = t.type({
+   id: t.number,
+   angle: t.number,
+   speed: t.number,
+   pin: t.UnionType t.number | t.undefined,
+   address: t.number | t.undefined,
+});
+
+
 export type Led = t.TypeOf<typeof ledCodec>;
 
 const statusCodec = t.type({
@@ -24,7 +34,7 @@ export default {
       try {
          const response = await axiosInstance.get<Status>("/api/status");
          const result = statusCodec.decode(response.data);
-
+         // type guard
          if (result._tag === "Left") {
             throw new Error(
                `Response data has an unexpected type: ${result.left}`
