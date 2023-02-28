@@ -1,6 +1,6 @@
+
 #include <Arduino.h>
-#include <esp32-hal-gpio.h>
-#include <esp32-hal-timer.h>
+
 // Importing necessary libraries
 #include <Adafruit_PWMServoDriver.h>
 #include <AsyncTCP.h>
@@ -35,7 +35,7 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 // Watch video V1 to understand the two lines below: http://youtu.be/y8X9X10Tn1k
 
 // Global State  Variables
-
+#define CYCLE_PIN 18
 #define SERVO_PWM_MIN \
    80  // this is the 'minimum' pulse length count (out of 4096)
 #define SERVO_PWM_MAX \
@@ -44,14 +44,15 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 #define SERVO_MAX_ANGLE 180
 #define SERVO_FREQ 60  // Analog servos run at ~60 Hz updates
 std::vector<LedState> leds = {{1, false, 16}, {2, false, 19}, {3, false, 15}};
-std::vector<ServoState> servos = {{1, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
+std::vector<ServoState> servos = {{0, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE},
-                                  {2, 13, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
+                                  {1, 13, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE}};
 
+// SemaphoreHandle_t outputsSemaphore;
 Outputs outputs = {leds, servos};
 
-RemoteControlTarget remoteControlTarget = {0.2f, {{1, 0.0f}, {2, 0.0f}}};
+RemoteControlTarget remoteControlTarget = {0.4f, {{1, 0.0f}, {2, 0.0f}}};
 
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
@@ -69,8 +70,15 @@ MotionMode motionMode = STARTUP;
 int startupCounter = 0;
 /** Hardware timer for 100 Hz servo update frequency*/
 hw_timer_t *timer = NULL;
-
+volatile bool timerIsRunning = false;
 void IRAM_ATTR motorLoopISR() {
+   if (timerIsRunning) {
+      Serial.println("Timer ISR called before last loop finished");
+      return;
+   }
+   timerIsRunning = true;
+   digitalWrite(CYCLE_PIN, HIGH);
+
    switch (motionMode) {
       // Move servos to start position
       case STARTUP:
@@ -84,35 +92,51 @@ void IRAM_ATTR motorLoopISR() {
          float speed = remoteControlTarget.speed;
          for (const auto &pos : remoteControlTarget.positions) {
             int id = pos.id;
-            auto it =
+            auto servo =
                 std::find_if(outputs.servos.begin(), outputs.servos.end(),
                              [&](const ServoState &s) { return s.id == id; });
-            if (it != outputs.servos.end()) {
-               float currentPos = it->position;
+            if (servo != outputs.servos.end()) {
+               float currentPos = servo->position;
                float targetPos = pos.position;
                float gradient = targetPos - currentPos;
                gradient = std::max(-speed, std::min(speed, gradient));  // limit
-               it->position += gradient;
-               it->position = std::max((float)it->minAngle,
-                                       std::min((float)it->maxAngle,
-                                                it->position));  // limit servo
+               currentPos += gradient;
+               servo->position = std::max(servo->minAngle,
+                                          std::min(servo->maxAngle,
+                                                   currentPos));  // limit servo
             }
          }
          break;
    }
 
    // Calculate new servo positions
+   // count to 10000
+   //    for (int i = 0; i < 2; i++) {
+   //       // do nothing
 
+   //       ledcWrite(i, 200);
+   //    }
+
+   // xSemaphoreTake(outputsMutex, portMAX_DELAY);
    for (auto &servo : outputs.servos) {
-      int pwm = map(servo.position, servo.minAngle, servo.maxAngle,
-                    servo.minPwm, servo.maxPwm);
+      int position = servo.position;
+      int pwm = map(position, servo.minAngle, servo.maxAngle, servo.minPwm,
+                    servo.maxPwm);
       ledcWrite(servo.id, pwm);
    }
+   // xSemaphoreGive(outputsMutex);
+   digitalWrite(CYCLE_PIN, LOW);
+   timerIsRunning = false;
 }
 
 void setup() {
    // Serial port for debugging purposes
    Serial.begin(115200);
+
+   // intialize semaphores
+   //  Initialize the semaphore with a count of 1
+   // outputsSemaphore = xSemaphoreCreateBinary();
+
    for (const auto &led : outputs.leds) {
       pinMode(led.pin, OUTPUT);
       digitalWrite(led.pin, led.isOn ? HIGH : LOW);
@@ -140,6 +164,10 @@ void setup() {
       Serial.println("An Error has occurred while mounting SPIFFS");
       return;
    }
+
+   // Set the server to run on the secondary core
+   // Set the server to run on the secondary core
+
    // iterate of frontendFiles
    for (int i = 0; i < frontendFilesCount; i++) {
       const FrontendFileInfo fileInfo = frontendFileInfos[i];
@@ -167,6 +195,10 @@ void setup() {
                               "image/svg+xml", false);
              });
    setupApi(&server, &outputs, &remoteControlTarget, &motionMode);
+
+   server.onNotFound([](AsyncWebServerRequest *request) {
+      request->send(404, "text/plain", "Not found");
+   });
    // Set Headers
    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods",
@@ -175,6 +207,7 @@ void setup() {
                                         "Content-Type");
 
    // Start server
+
    server.begin();
 
    // Servo Stuff
@@ -184,7 +217,7 @@ void setup() {
    board1.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
    // Start Hardware Timer loop
-   pinMode(14, OUTPUT);              // Set loop debug pin as output
+   pinMode(CYCLE_PIN, OUTPUT);       // Set loop debug pin as output
    timer = timerBegin(0, 80, true);  // Timer 0, Prescaler 80, Count up
    timerAttachInterrupt(timer, &motorLoopISR, true);  // Attach the ISR
    timerAlarmWrite(timer, 10000, true);               // 100 Hz,
@@ -194,13 +227,13 @@ void setup() {
 // Enable the timer
 
 void loop() {
-   //    for (int angle = 0; angle < 300; angle += 1) {
-   //       for (int i = 0; i < 16; i++) {
-   //          board1.setPWM(i, 0, angleToPulse(angle));
-   //       }
-   //       delay(10);
-   //    }
+   //    //    for (int angle = 0; angle < 300; angle += 1) {
+   //    //       for (int i = 0; i < 16; i++) {
+   //    //          board1.setPWM(i, 0, angleToPulse(angle));
+   //    //       }
+   //    //       delay(10);
+   //    //    }
 
-   //    // robojax PCA9865 16 channel Servo control
-   delay(500);
+   //    //    // robojax PCA9865 16 channel Servo control
+   //    delay(500);
 }

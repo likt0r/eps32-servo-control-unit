@@ -4,11 +4,11 @@
 
 struct TargetPosition {
    int id;
-   float position;
+   volatile float position;
 };
 
 struct RemoteControlTarget {
-   float speed;
+   volatile float speed;
    std::vector<TargetPosition> positions;
    bool setServoPositionById(int id, float position);
 };

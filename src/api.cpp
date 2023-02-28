@@ -8,6 +8,8 @@
 #include "motion/remote.h"
 #include "outputs.h"
 
+extern bool timerIsRunning;
+
 void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
               RemoteControlTarget *remoteControlTarget_p,
               MotionMode *motionMode) {
@@ -45,10 +47,21 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
 
           // ...
        }));
+   server_p->on("/api/motion/position", HTTP_OPTIONS,
+                [](AsyncWebServerRequest *request) {
+                   request->send(200, "text/plain", "");
+                });
    server_p->addHandler(new AsyncCallbackJsonWebHandler(
        "/api/motion/position",
        [remoteControlTarget_p](AsyncWebServerRequest *request,
                                JsonVariant &json) {
+          if (timerIsRunning) {
+             Serial.println("Motion Interrupt is running");
+             request->send(400, "application/json",
+                           "{\"error\":\"Motion is running\"}");
+             return;
+          }
+          timerIsRunning = true;
           Serial.println("/api/motion/position");
 
           JsonObject const &jsonObj = json.as<JsonObject>();
@@ -73,8 +86,35 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
                                     std::to_string(id) + " not found\"}";
              request->send(400, "application/json", errorStr.c_str());
           }
+          timerIsRunning = false;
        }));
+   server_p->on("/api/motion/speed", HTTP_OPTIONS,
+                [](AsyncWebServerRequest *request) {
+                   request->send(200, "text/plain", "");
+                });
+   server_p->addHandler(new AsyncCallbackJsonWebHandler(
+       "/api/motion/speed",
+       [remoteControlTarget_p](AsyncWebServerRequest *request,
+                               JsonVariant &json) {
+          Serial.println("/api/motion/speed");
 
+          JsonObject const &jsonObj = json.as<JsonObject>();
+          if (!jsonObj.containsKey("speed")) {
+             request->send(400, "application/json",
+                           "{\"error\":\"Missing speed\"}");
+             return;
+          }
+
+          float speed = jsonObj["speed"];
+          float position = jsonObj["position"];
+
+          remoteControlTarget_p->speed = speed;
+          request->send(200, "application/json", "{\"success\":true}");
+       }));
+   server_p->on("/api/motion/mode", HTTP_OPTIONS,
+                [](AsyncWebServerRequest *request) {
+                   request->send(200, "text/plain", "");
+                });
    server_p->addHandler(new AsyncCallbackJsonWebHandler(
        "/api/motion/mode",
        [motionMode](AsyncWebServerRequest *request, JsonVariant &json) {

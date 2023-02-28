@@ -57,17 +57,19 @@ String Outputs::outputToJson() {
    DynamicJsonDocument doc(1024);
    JsonArray jsonLeds = doc.createNestedArray("leds");
    for (const auto &led : leds) {
+      bool isOn = led.isOn;
       JsonObject jsonLed = jsonLeds.createNestedObject();
       jsonLed["id"] = led.id;
-      jsonLed["isOn"] = led.isOn;
+      jsonLed["isOn"] = isOn;
       jsonLed["pin"] = led.pin;
    }
    JsonArray jsonServos = doc.createNestedArray("servos");
    for (const auto &servo : servos) {
+      float position = servo.position;
       JsonObject jsonServo = jsonServos.createNestedObject();
       jsonServo["id"] = servo.id;
       jsonServo["pin"] = servo.pin;
-      jsonServo["position"] = servo.position;
+      jsonServo["position"] = position;
       jsonServo["minPwm"] = servo.minPwm;
       jsonServo["maxPwm"] = servo.maxPwm;
       jsonServo["minAngle"] = servo.minAngle;

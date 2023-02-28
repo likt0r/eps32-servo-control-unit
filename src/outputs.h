@@ -8,18 +8,18 @@
 
 struct LedState {
    int id;
-   bool isOn;
+   volatile bool isOn;
    int pin;
 };
 
 struct ServoState {
    int id;
    int pin;
-   float position;
+   volatile float position;
    int minPwm;
    int maxPwm;
-   int minAngle;
-   int maxAngle;
+   float minAngle;
+   float maxAngle;
 };
 
 struct Outputs {
