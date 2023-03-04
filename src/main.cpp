@@ -21,8 +21,8 @@
 // Setting network credentials
 // const char *ssid = "Sauf-Lan";
 // const char *password = "gpun94$_/W";
-const char *ssid = "Karl-Fritz";
-const char *password = "24333800157909807591";
+const char *ssid = "ALM4OG_RPT";
+const char *password = "domn8udomn8u2domn8u3";
 
 // Servorboard
 // called this way, it uses the default address 0x40
@@ -46,13 +46,13 @@ Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 std::vector<LedState> leds = {{1, false, 16}, {2, false, 19}, {3, false, 15}};
 std::vector<ServoState> servos = {{0, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE},
-                                  {1, 13, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
+                                  {1, 25, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE}};
 
 // SemaphoreHandle_t outputsSemaphore;
 Outputs outputs = {leds, servos};
 
-RemoteControlTarget remoteControlTarget = {0.4f, {{1, 0.0f}, {2, 0.0f}}};
+RemoteControlTarget remoteControlTarget = {0.4f, {{0, 0.0f}, {1, 0.0f}}};
 
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
@@ -71,12 +71,8 @@ int startupCounter = 0;
 /** Hardware timer for 100 Hz servo update frequency*/
 hw_timer_t *timer = NULL;
 volatile bool timerIsRunning = false;
-void IRAM_ATTR motorLoopISR() {
-   if (timerIsRunning) {
-      Serial.println("Timer ISR called before last loop finished");
-      return;
-   }
-   timerIsRunning = true;
+
+void motorLoopISR() {
    digitalWrite(CYCLE_PIN, HIGH);
 
    switch (motionMode) {
@@ -109,24 +105,13 @@ void IRAM_ATTR motorLoopISR() {
          break;
    }
 
-   // Calculate new servo positions
-   // count to 10000
-   //    for (int i = 0; i < 2; i++) {
-   //       // do nothing
-
-   //       ledcWrite(i, 200);
-   //    }
-
-   // xSemaphoreTake(outputsMutex, portMAX_DELAY);
    for (auto &servo : outputs.servos) {
       int position = servo.position;
-      int pwm = map(position, servo.minAngle, servo.maxAngle, servo.minPwm,
-                    servo.maxPwm);
+      int pwm = map(round(position), servo.minAngle, servo.maxAngle,
+                    servo.minPwm, servo.maxPwm);
       ledcWrite(servo.id, pwm);
    }
-   // xSemaphoreGive(outputsMutex);
    digitalWrite(CYCLE_PIN, LOW);
-   timerIsRunning = false;
 }
 
 void setup() {
@@ -217,23 +202,28 @@ void setup() {
    board1.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
    // Start Hardware Timer loop
-   pinMode(CYCLE_PIN, OUTPUT);       // Set loop debug pin as output
-   timer = timerBegin(0, 80, true);  // Timer 0, Prescaler 80, Count up
-   timerAttachInterrupt(timer, &motorLoopISR, true);  // Attach the ISR
-   timerAlarmWrite(timer, 10000, true);               // 100 Hz,
-   timerAlarmEnable(timer);
+   pinMode(CYCLE_PIN, OUTPUT);  // Set loop debug pin as output
+   //    timer = timerBegin(0, 80, true);  // Timer 0, Prescaler 80, Count up
+   //    timerAttachInterrupt(timer, &motorLoopISR, true);  // Attach the ISR
+   //    timerAlarmWrite(timer, 10000, true);               // 100 Hz,
+   //    timerAlarmEnable(timer);
 }
 
 // Enable the timer
+#define TIMER_DURATION 10
+unsigned long lastTimerStart = 0;
+bool timerExpired12 = false;
 
 void loop() {
-   //    //    for (int angle = 0; angle < 300; angle += 1) {
-   //    //       for (int i = 0; i < 16; i++) {
-   //    //          board1.setPWM(i, 0, angleToPulse(angle));
-   //    //       }
-   //    //       delay(10);
-   //    //    }
+   if (millis() - lastTimerStart >= TIMER_DURATION && timerExpired12 == false) {
+      timerExpired12 = true;
+      // Do something when the timer expires
+      motorLoopISR();
+   }
 
-   //    //    // robojax PCA9865 16 channel Servo control
-   //    delay(500);
+   // Reset the timer
+   if (timerExpired12 == true) {
+      lastTimerStart = millis();
+      timerExpired12 = false;
+   }
 }

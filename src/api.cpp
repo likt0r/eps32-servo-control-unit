@@ -8,8 +8,6 @@
 #include "motion/remote.h"
 #include "outputs.h"
 
-extern bool timerIsRunning;
-
 void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
               RemoteControlTarget *remoteControlTarget_p,
               MotionMode *motionMode) {
@@ -55,14 +53,7 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
        "/api/motion/position",
        [remoteControlTarget_p](AsyncWebServerRequest *request,
                                JsonVariant &json) {
-          if (timerIsRunning) {
-             Serial.println("Motion Interrupt is running");
-             request->send(400, "application/json",
-                           "{\"error\":\"Motion is running\"}");
-             return;
-          }
-          timerIsRunning = true;
-          Serial.println("/api/motion/position");
+          Serial.println("post /api/motion/position");
 
           JsonObject const &jsonObj = json.as<JsonObject>();
           if (!jsonObj.containsKey("id")) {
@@ -72,7 +63,7 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
           }
           if (!jsonObj.containsKey("position")) {
              request->send(400, "application/json",
-                           "{\"error\":\"Missing id\"}");
+                           "{\"error\":\"Missing position\"}");
              return;
           }
           int id = jsonObj["id"];
@@ -86,8 +77,16 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
                                     std::to_string(id) + " not found\"}";
              request->send(400, "application/json", errorStr.c_str());
           }
-          timerIsRunning = false;
        }));
+   server_p->on("/api/motion/speed", HTTP_GET,
+                [remoteControlTarget_p](AsyncWebServerRequest *request) {
+                   Serial.println("GET /api/motion/speed");
+                   char buffer[10];
+
+                   request->send(
+                       200, "application/json",
+                       dtostrf(remoteControlTarget_p->speed, 7, 3, buffer));
+                });
    server_p->on("/api/motion/speed", HTTP_OPTIONS,
                 [](AsyncWebServerRequest *request) {
                    request->send(200, "text/plain", "");

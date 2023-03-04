@@ -1,20 +1,22 @@
 <script lang="ts">
 import { defineComponent, ComponentPublicInstance, ref } from "vue";
 import apiInstance from "@/Api";
-import { Servo } from "@/Api";
+import { Servo, MotionMode } from "@/Api";
 import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
 
 interface IInstance extends ComponentPublicInstance {
-   setServoData(data: Servo[]): void;
+   setViewData(data: Servo[], mode: MotionMode, speed: number): void;
 }
 
 export default defineComponent({
    async beforeRouteEnter(to, from, next) {
       try {
          const data = await apiInstance.getServos();
+         const motionSpeed = await apiInstance.getMotionSpeed();
+         await apiInstance.setMotionMode(MotionMode.Remote_Control);
          next((vm) => {
             const instance = vm as IInstance;
-            instance.setServoData(data);
+            instance.setViewData(data, MotionMode.Remote_Control, motionSpeed);
          });
       } catch (error) {
          console.log("error", error);
@@ -27,9 +29,13 @@ export default defineComponent({
 <script lang="ts" setup>
 const servos = ref<Servo[]>([]);
 const motionSpeed = ref<number>(0.1);
-const setServoData = (data: Servo[]) => {
+const motionMode = ref<MotionMode>(MotionMode.Idle);
+
+function setViewData(data: Servo[], mode: MotionMode, speed: number) {
    servos.value = data;
-};
+   motionSpeed.value = speed;
+   motionMode.value = mode;
+}
 
 async function updateLedData() {
    try {
@@ -54,7 +60,7 @@ async function onMotionSpeedUpdate(speed: number) {
    }
 }
 
-defineExpose({ setServoData });
+defineExpose({ setViewData });
 </script>
 
 <template>
@@ -70,8 +76,8 @@ defineExpose({ setServoData });
                   <v-slider
                      v-model="motionSpeed"
                      :min="0"
-                     :max="3"
-                     :step="0.05"
+                     :max="5"
+                     :step="0.01"
                      @update:model-value="onMotionSpeedUpdate"
                      thumb-label
                      :prepend-icon="mdiSpeedometer"
