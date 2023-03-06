@@ -1,7 +1,9 @@
 <script lang="ts">
 import { defineComponent, ComponentPublicInstance, ref } from "vue";
 import apiInstance from "@/Api";
-import { Servo, MotionMode } from "@/Api";
+import { nanoid } from "nanoid";
+import { Servo, MotionMode, MotionSequence, Keyframe } from "@/Api";
+import MotionSequenceComponent from "@/components/MotionSequence.vue";
 import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
 
 interface IInstance extends ComponentPublicInstance {
@@ -30,6 +32,18 @@ export default defineComponent({
 const servos = ref<Servo[]>([]);
 const motionSpeed = ref<number>(0.1);
 const motionMode = ref<MotionMode>(MotionMode.Idle);
+
+const currentMotionSequence = ref<MotionSequence>(createNewMotionSequence());
+
+function createNewMotionSequence(): MotionSequence {
+   return {
+      name: "New Motion Sequence",
+      id: nanoid(),
+      loop: false,
+      speedMultiplier: 1,
+      keyframes: new Array<Keyframe>(),
+   };
+}
 
 function setViewData(data: Servo[], mode: MotionMode, speed: number) {
    servos.value = data;
@@ -67,6 +81,7 @@ defineExpose({ setViewData });
    <v-card flat>
       <v-card-text>
          <v-container fluid>
+            <MotionSequenceComponent :sequence="currentMotionSequence" />
             <v-row>
                <v-col cols="12" sm="10" md="10">
                   <div class="text-caption">
@@ -74,10 +89,12 @@ defineExpose({ setViewData });
                   </div>
 
                   <v-slider
+                     density="compact"
                      v-model="motionSpeed"
                      :min="0"
                      :max="5"
                      :step="0.01"
+                     color="secondary"
                      @update:model-value="onMotionSpeedUpdate"
                      thumb-label
                      :prepend-icon="mdiSpeedometer"
@@ -102,6 +119,7 @@ defineExpose({ setViewData });
                      :min="servo.minAngle"
                      :max="servo.maxAngle"
                      :step="0.1"
+                     color="primary"
                      thumb-label
                      @update:model-value="onPositionUpdate(servo.id, $event)"
                      :prepend-icon="mdiAngleAcute"

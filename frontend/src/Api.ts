@@ -29,6 +29,31 @@ export enum MotionMode {
    Editor = "editor",
 }
 export const motionModeCodec = fromEnum<MotionMode>("MotionMode", MotionMode);
+
+export const KeyframeCodec = t.type({
+   name: t.string,
+   id: t.string,
+   transitionDuration: t.number,
+   pauseDuration: t.number,
+   targetPositions: t.array(
+      t.type({
+         id: t.number,
+         position: t.number,
+      })
+   ),
+});
+
+export const MotionSequenceCodec = t.type({
+   name: t.string,
+   id: t.string,
+   keyframes: t.array(KeyframeCodec),
+   loop: t.boolean,
+   speedMultiplier: t.number,
+});
+
+export type Keyframe = t.TypeOf<typeof KeyframeCodec>;
+export type MotionSequence = t.TypeOf<typeof MotionSequenceCodec>;
+
 export type Led = t.TypeOf<typeof ledCodec>;
 export type Servo = t.TypeOf<typeof servoCodec>;
 

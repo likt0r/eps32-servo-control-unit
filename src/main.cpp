@@ -51,8 +51,9 @@ std::vector<ServoState> servos = {{0, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
 
 // SemaphoreHandle_t outputsSemaphore;
 Outputs outputs = {leds, servos};
-
-RemoteControlTarget remoteControlTarget = {0.4f, {{0, 0.0f}, {1, 0.0f}}};
+// initialise the remote control target from the outputs
+RemoteControlTarget remoteControlTarget =
+    createRemoteControlTarget(outputs.servos, 0.5);  // 0.5 degrees per cycle
 
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
