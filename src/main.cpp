@@ -13,6 +13,7 @@
 
 #include "FrontendFiles.h"
 #include "SPIFFS.h"
+#include "WiFiManager.h"
 #include "api.h"
 #include "motion/motion.h"
 #include "motion/remote.h"
@@ -23,6 +24,15 @@
 // const char *password = "gpun94$_/W";
 const char *ssid = "ALM4OG_RPT";
 const char *password = "domn8udomn8u2domn8u3";
+
+// WiFi Credentials
+const int NUM_WIFI_NETWORKS = 2;
+WiFiCredentials wifiCredentials[NUM_WIFI_NETWORKS] = {
+    {"ALM4OG_RPT", "domn8udomn8u2domn8u3"}, {"Sauf-Lan", "gpun94$_/W"}};
+
+WiFiCredentials apCredentials = {"MotionController", "password"};
+
+WiFiManager wifiManager = WiFiManager();
 
 // Servorboard
 // called this way, it uses the default address 0x40
@@ -135,15 +145,18 @@ void setup() {
       ledcAttachPin(servo.pin, servo.id);
    }
 
-   // Connect to Wi-Fi
-   WiFi.begin(ssid, password);
-   while (WiFi.status() != WL_CONNECTED) {
-      delay(1000);
-      Serial.println("Connecting to WiFi");
-   }
+   //    // Connect to Wi-Fi
+   //    WiFi.begin(ssid, password);
+   //    while (WiFi.status() != WL_CONNECTED) {
+   //       delay(1000);
+   //       Serial.println("Connecting to WiFi");
+   //    }
+   wifiManager.setup(wifiCredentials, NUM_WIFI_NETWORKS, 5000, &apCredentials);
 
    // Print ESP Local IP Address
-   Serial.println(WiFi.localIP());
+
+   Serial.print("IP-Address ");
+   Serial.println(wifiManager.getLocalIP());
 
    // Initialize SPIFFS
    if (!SPIFFS.begin()) {
