@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { existsSync } = require("fs");
 const { lookup } = require("mime-types");
-
+const { nanoid } = require("nanoid");
 const buildFolder = "dist";
 const dataFolder = "../data";
 const libFolder = "../lib/frontend-files";
@@ -26,12 +26,32 @@ function walk(dir) {
 (function () {
    // get all files in build folder
    const files = walk(buildFolder);
-   const fileInfos = files.map((file) => ({
-      fileUrl: file,
-      filepath: file.replace(/\//g, "_").replace(/^_/, "/"),
-      mimeType: lookup(file),
-   }));
-
+   const fileInfos = files
+      .map((file) => {
+         const isGzipped = /\.gz$/.test(file);
+         const fileUrl = isGzipped ? file.replace(/\.gz$/, "") : file;
+         return {
+            fileUrl,
+            sourceFilepath: file,
+            targetFilepath: "/" + nanoid(10),
+            mimeType: lookup(fileUrl),
+            isGzipped,
+         };
+      })
+      .reduce((acc, fileInfo) => {
+         acc.push(fileInfo);
+         if (fileInfo.fileUrl === "/index.html") {
+            // add index.html is also served on /
+            acc.push({
+               fileUrl: "/",
+               sourceFilepath: fileInfo.sourceFilepath,
+               targetFilepath: fileInfo.targetFilepath,
+               mimeType: fileInfo.mimeType,
+               isGzipped: fileInfo.isGzipped,
+            });
+         }
+         return acc;
+      }, []);
    console.log(fileInfos);
    // empty data folder
    if (existsSync(dataFolder))
@@ -42,8 +62,8 @@ function walk(dir) {
    // copy files to data folder
    for (const fileInfo of fileInfos) {
       fs.copyFileSync(
-         path.join(buildFolder, fileInfo.fileUrl),
-         path.join(dataFolder, fileInfo.filepath)
+         path.join(buildFolder, fileInfo.sourceFilepath),
+         path.join(dataFolder, fileInfo.targetFilepath)
       );
    }
    // check if lib folder exists
@@ -56,7 +76,7 @@ function walk(dir) {
 
    const fileStructs = fileInfos.map(
       (fileInfo) =>
-         `{"${fileInfo.fileUrl}", "${fileInfo.filepath}", "${fileInfo.mimeType}"}`
+         `{"${fileInfo.fileUrl}", "${fileInfo.targetFilepath}", "${fileInfo.mimeType}", ${fileInfo.isGzipped}}`
    );
    const fileStructsStr = fileStructs.join(",\n");
    const fileStructsArray = `
@@ -64,7 +84,7 @@ struct FrontendFileInfo{
     std::string url;
     std::string filepath;
     std::string mimeType;
-  
+    bool isGzipped;  
 };
 const int frontendFilesCount = ${fileStructs.length};
 const FrontendFileInfo frontendFileInfos[${fileStructs.length}] = {\n${fileStructsStr}\n};`;

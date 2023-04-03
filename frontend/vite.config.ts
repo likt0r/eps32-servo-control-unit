@@ -1,41 +1,37 @@
 // Plugins
-import vue from '@vitejs/plugin-vue'
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-
+import vue from "@vitejs/plugin-vue";
+import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import gzipPlugin from "rollup-plugin-gzip";
 // Utilities
-import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'node:url'
-
+import { defineConfig } from "vite";
+import { fileURLToPath, URL } from "node:url";
+import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    vue({ 
-      template: { transformAssetUrls }
-    }),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
-    vuetify({
-      autoImport: true,
-      styles: {
-        configFile: 'src/styles/settings.scss',
+   build: {
+      chunkSizeWarningLimit: 999999999, // Disable chunk splitting
+   },
+   plugins: [
+      vue({
+         template: { transformAssetUrls },
+      }),
+      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
+      vuetify({
+         autoImport: true,
+         styles: {
+            configFile: "src/styles/settings.scss",
+         },
+      }),
+      gzipPlugin(), //zip outputs
+   ],
+   define: { "process.env": {} },
+   resolve: {
+      alias: {
+         "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
-    }),
-  ],
-  define: { 'process.env': {} },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
-    extensions: [
-      '.js',
-      '.json',
-      '.jsx',
-      '.mjs',
-      '.ts',
-      '.tsx',
-      '.vue',
-    ],
-  },
-  server: {
-    port: 3000,
-  },
-})
+      extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
+   },
+   server: {
+      port: 3000,
+   },
+});

@@ -27,8 +27,7 @@ const char *password = "domn8udomn8u2domn8u3";
 
 // WiFi Credentials
 const int NUM_WIFI_NETWORKS = 2;
-WiFiCredentials wifiCredentials[NUM_WIFI_NETWORKS] = {
-    {"ALM4OG_RPT", "domn8udomn8u2domn8u3"}, {"Sauf-Lan", "gpun94$_/W"}};
+WiFiCredentials wifiCredentials[NUM_WIFI_NETWORKS] = {};
 
 WiFiCredentials apCredentials = {"MotionController", "password"};
 
@@ -170,33 +169,28 @@ void setup() {
    // iterate of frontendFiles
    for (int i = 0; i < frontendFilesCount; i++) {
       const FrontendFileInfo fileInfo = frontendFileInfos[i];
-      server.on(frontendFileInfos[i].url.c_str(), HTTP_GET,
+      server.on(fileInfo.url.c_str(), HTTP_GET,
                 [fileInfo](AsyncWebServerRequest *request) {
-                   Serial.println("get /");
-                   request->send(SPIFFS, fileInfo.filepath.c_str(),
-                                 fileInfo.mimeType.c_str(), false);
+                   Serial.println((std::string("get ") + fileInfo.url +
+                                   std::string(" file: ") + fileInfo.filepath)
+                                      .c_str());
+                   if (fileInfo.isGzipped) {
+                      AsyncWebServerResponse *response = request->beginResponse(
+                          SPIFFS, fileInfo.filepath.c_str(),
+                          fileInfo.mimeType.c_str(), false);
+                      response->addHeader("Content-Encoding", "gzip");
+                      request->send(response);
+                   } else {
+                      request->send(SPIFFS, fileInfo.filepath.c_str(),
+                                    fileInfo.mimeType.c_str(), false);
+                   }
                 });
    }
 
-   // Route for root / web page
-   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      Serial.println("get /");
-      request->send(SPIFFS, "/index.html", "text/html", false);
-   });
-   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
-      Serial.println("get /favicon.ico");
-      request->send(SPIFFS, "/favicon.ico", "image/vnd.microsoft.icon", false);
-   });
-   server.on("/assets/logo-da9b9095.svg", HTTP_GET,
-             [](AsyncWebServerRequest *request) {
-                Serial.println("get /favicon.ico");
-                request->send(SPIFFS, "/assets_logo-da9b9095.svg",
-                              "image/svg+xml", false);
-             });
    setupApi(&server, &outputs, &remoteControlTarget, &motionMode);
 
    server.onNotFound([](AsyncWebServerRequest *request) {
-      request->send(404, "text/plain", "Not found");
+      request->send(404, "text/html", "Not found");
    });
    // Set Headers
    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
