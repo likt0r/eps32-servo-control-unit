@@ -1,35 +1,23 @@
 #include "WiFiManager.h"
 
+#include "SPIFFS.h"
 #include "WiFi.h"
 
-WiFiManager::WiFiManager() {
-   _credentials = NULL;
-   _numCredentials = 0;
-   _timeout = 10000;
-   _accessPointMode = false;
-   _currentCredentialIndex = 0;
-   _apCredentials = NULL;
-}
+WiFiManager::WiFiManager() {}
 
-void WiFiManager::setup(const WiFiCredentials* credentials, int numCredentials,
-                        int timeout, const WiFiCredentials* apCredentials) {
-   _credentials = credentials;
-   _numCredentials = numCredentials;
+void WiFiManager::setup(int timeout, const WiFiCredentials* apCredential) {
    _timeout = timeout;
-   _accessPointMode = false;
-   _currentCredentialIndex = 0;
-   _apCredentials = apCredentials;
-
+   _apCredentials = apCredential;
    WiFi.mode(WIFI_STA);
 
-   for (int i = 0; i < _numCredentials; i++) {
+   for (const auto& cred : _credentials) {
       // print wifi credentials
       Serial.print("Connecting to ");
-      Serial.print(_credentials[i].ssid);
+      Serial.print(cred.ssid);
       Serial.print(" with password ");
-      Serial.println(_credentials[i].password);
+      Serial.println(cred.password);
 
-      WiFi.begin(_credentials[i].ssid, _credentials[i].password);
+      WiFi.begin(cred.ssid, cred.password);
       unsigned long startAttemptTime = millis();
       while (WiFi.status() != WL_CONNECTED &&
              millis() - startAttemptTime < _timeout) {
@@ -61,11 +49,76 @@ void WiFiManager::setup(const WiFiCredentials* credentials, int numCredentials,
 
 bool WiFiManager::isConnected() { return WiFi.status() == WL_CONNECTED; }
 
-IPAddress WiFiManager::getLocalIP() {
-   if (_accessPointMode) {
-      return IPAddress(192, 168, 4, 1);
-   }
-   return WiFi.localIP();
-}
+IPAddress WiFiManager::getLocalIP() { return WiFi.localIP(); }
 
 bool WiFiManager::isAccessPoint() { return _accessPointMode; }
+
+void WiFiManager::setCredentials(
+    const std::vector<WiFiCredentials>& credentials) {
+   _credentials = credentials;
+}
+
+void WiFiManager::removeCredential(int index) {
+   if (index >= 0 && index < _credentials.size()) {
+      _credentials.erase(_credentials.begin() + index);
+   }
+}
+
+void WiFiManager::saveCredentials() {
+   if (!SPIFFS.begin()) {
+      Serial.println("Failed to mount file system");
+      return;
+   }
+
+   File file = SPIFFS.open("/wifi_credentials.txt", "w");
+   if (!file) {
+      Serial.println("Credentials file not found, creating a new one");
+      file = SPIFFS.open("/wifi_credentials.txt", "w");
+      if (!file) {
+         Serial.println("Failed to create credentials file");
+         return;
+      }
+      file.close();
+      return;
+   }
+
+   for (const auto& cred : _credentials) {
+      file.printf("%s:%s\n", cred.ssid, cred.password);
+   }
+
+   file.close();
+}
+
+void WiFiManager::loadCredentials() {
+   if (!SPIFFS.begin()) {
+      Serial.println("Failed to mount file system");
+      return;
+   }
+
+   File file = SPIFFS.open("/wifi_credentials.txt", "r");
+   if (!file) {
+      Serial.println("loadCredentials: Credentials file not found");
+      return;
+   } else {
+      Serial.println("loadCredentials: Credentials file found");
+   }
+
+   _credentials.clear();
+
+   while (file.available()) {
+      String line = file.readStringUntil('\n');
+      int separatorIndex = line.indexOf(':');
+      if (separatorIndex == -1) continue;
+
+      String ssid = line.substring(0, separatorIndex);
+      String password = line.substring(separatorIndex + 1);
+
+      _credentials.push_back({ssid.c_str(), password.c_str()});
+   }
+
+   file.close();
+}
+
+const std::vector<WiFiCredentials>& WiFiManager::getCredentials() const {
+   return _credentials;
+}

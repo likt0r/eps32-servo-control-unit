@@ -1,7 +1,9 @@
-#ifndef WIFIMANAGER_H
-#define WIFIMANAGER_H
+#ifndef WIFI_MANAGER_H
+#define WIFI_MANAGER_H
 
-#include <WiFi.h>
+#include <FS.h>
+
+#include <vector>
 
 struct WiFiCredentials {
    const char* ssid;
@@ -11,19 +13,22 @@ struct WiFiCredentials {
 class WiFiManager {
   public:
    WiFiManager();
-   void setup(const WiFiCredentials* credentials, int numCredentials,
-              int timeout, const WiFiCredentials* apCredentials);
+   void setup(int timeout, const WiFiCredentials* apCredentials);
    bool isConnected();
    IPAddress getLocalIP();
    bool isAccessPoint();
+   void addCredential(const char* ssid, const char* password);
+   void removeCredential(int index);
+   void saveCredentials();
+   void loadCredentials();
+   const std::vector<WiFiCredentials>& getCredentials() const;
+   void WiFiManager::setCredentials(
+       const std::vector<WiFiCredentials>& credentials)
 
-  private:
-   const WiFiCredentials* _credentials;
-   int _numCredentials;
+       private : std::vector<WiFiCredentials> _credentials;
    int _timeout;
    bool _accessPointMode;
-   int _currentCredentialIndex;
    const WiFiCredentials* _apCredentials;
 };
 
-#endif  // WIFIMANAGER_H
+#endif  // WIFI_MANAGER_H

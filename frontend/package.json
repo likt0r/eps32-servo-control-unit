@@ -21,6 +21,7 @@
       "ts-node": "^10.9.1",
       "vue": "^3.2.13",
       "vue-router": "^4.0.0",
+      "vuedraggable": "^4.1.0",
       "vuetify": "^3.0.0",
       "webfontloader": "^1.0.0"
    },
@@ -29,6 +30,7 @@
       "@types/axios": "^0.14.0",
       "@types/mime-types": "^2.1.1",
       "@types/node": "^18.11.9",
+      "@types/vuedraggable": "^2.24.0",
       "@types/webfontloader": "^1.6.35",
       "@vitejs/plugin-vue": "^3.0.3",
       "@vue/eslint-config-typescript": "^11.0.0",

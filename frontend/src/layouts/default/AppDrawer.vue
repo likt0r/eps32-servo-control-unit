@@ -38,5 +38,10 @@ const navigationPoints = [
       icon: mdiMovieOpenEdit,
       to: "/editor",
    },
+   {
+      title: "Settings",
+      icon: mdiMovieOpenEdit,
+      to: "/settings",
+   },
 ];
 </script>

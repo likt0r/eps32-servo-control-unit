@@ -8,9 +8,64 @@
 #include "motion/remote.h"
 #include "outputs.h"
 
+void handleCredentialsSetRequest(AsyncWebServerRequest *request,
+                                 JsonVariant &json, WiFiManager *wifiManager) {
+   if (!json.is<JsonArray>()) {
+      request->send(400);  // Bad request
+      return;
+   }
+
+   std::vector<WiFiCredentials> credentials;
+   for (const auto &cred : json.as<JsonArray>()) {
+      if (!cred.containsKey("ssid") || !cred.containsKey("password")) {
+         request->send(400);  // Bad request
+         return;
+      }
+      credentials.push_back(
+          {cred["ssid"].as<char *>(), cred["password"].as<char *>()});
+   }
+
+   wifiManager->setCredentials(credentials);
+   wifiManager->saveCredentials();
+   request->send(204);  // No content
+}
+
 void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
               RemoteControlTarget *remoteControlTarget_p,
-              MotionMode *motionMode) {
+              MotionMode *motionMode, WiFiManager *wifiManager) {
+   server_p->on("/api/wifi/credentials", HTTP_GET,
+                [wifiManager](AsyncWebServerRequest *request) {
+                   Serial.println("GET /api/wifi-credentials");
+                   String credentialsJson = "[";
+                   for (const auto &cred : wifiManager->getCredentials()) {
+                      credentialsJson += "{\"ssid\":\"" + String(cred.ssid) +
+                                         "\",\"password\":\"" +
+                                         String(cred.password) + "\"},";
+                   }
+                   if (credentialsJson.length() > 1) {
+                      credentialsJson.remove(credentialsJson.length() -
+                                             1);  // Remove the last comma
+                   }
+                   credentialsJson += "]";
+                   request->send(200, "application/json", credentialsJson);
+                });
+   server_p->on(
+       "api/wifi/credentials", HTTP_PUT,
+       [](AsyncWebServerRequest *request) {
+          request->send(200, "application/json", "{\"message\":\"OK\"}");
+       },
+       [wifiManager](AsyncWebServerRequest *request, const String &filename,
+                     size_t index, uint8_t *data, size_t len, bool final) {
+          if (!final) return;
+          StaticJsonDocument<1024> doc;
+          DeserializationError error = deserializeJson(doc, data, len);
+          if (error) {
+             request->send(400);  // Bad request
+             return;
+          }
+          handleCredentialsSetRequest(request, doc.as<JsonVariant>(),
+                                      wifiManager);
+       });
    server_p->on(
        "/api/status", HTTP_GET, [outputs_p](AsyncWebServerRequest *request) {
           Serial.println("/api/status");

@@ -66,6 +66,22 @@ const routes = [
          },
       ],
    },
+   {
+      path: "/settings",
+      component: () => import("@/layouts/default/Default.vue"),
+
+      children: [
+         {
+            path: "",
+            name: "settings",
+            // route level code-splitting
+            // this generates a separate chunk (about.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            // props: (to: any) => ({ data: to.meta.data }),
+            component: () => import("@/views/Settings.vue"),
+         },
+      ],
+   },
 ];
 
 const router = createRouter({

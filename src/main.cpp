@@ -150,7 +150,8 @@ void setup() {
    //       delay(1000);
    //       Serial.println("Connecting to WiFi");
    //    }
-   wifiManager.setup(wifiCredentials, NUM_WIFI_NETWORKS, 5000, &apCredentials);
+   wifiManager.loadCredentials();
+   wifiManager.setup(5000, &apCredentials);
 
    // Print ESP Local IP Address
 
@@ -187,7 +188,7 @@ void setup() {
                 });
    }
 
-   setupApi(&server, &outputs, &remoteControlTarget, &motionMode);
+   setupApi(&server, &outputs, &remoteControlTarget, &motionMode, &wifiManager);
 
    server.onNotFound([](AsyncWebServerRequest *request) {
       request->send(404, "text/html", "Not found");
