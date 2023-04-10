@@ -1,0 +1,10 @@
+get:
+  summary: Get status object off all ESP32 outputs
+  operationId: getStatus
+  responses:
+    '200':
+      description: An object which contains complete output status
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Status'

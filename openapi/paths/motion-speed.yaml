@@ -1,0 +1,20 @@
+put:
+  summary: Set tMotion speed 
+  operationId: updateMotionSpeed
+  requestBody:
+    description: Set target motion speed of all servos, will work only in remote_control mode
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: '../components.yaml#/schemas/MotionSpeed'
+  responses:
+    '204':
+      description: Motion speed updated successfully
+    '400':
+      description: Bad Request, f.e. missing speed field.
+      content:
+        application/json:
+          schema:
+              $ref: '../components.yaml#/schemas/Error'

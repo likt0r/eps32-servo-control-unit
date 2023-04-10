@@ -1,0 +1,127 @@
+schemas:
+  WifiCredential:
+    type: object
+    required:
+      - ssid
+      - password
+    properties:
+      ssid:
+        type: string
+        description: The SSID of the WiFi network
+      password:
+        type: string
+        description: The password of the WiFi network
+  LedStatus:
+    type: object
+    required:
+      - id
+      - isOn
+    properties:
+      id: 
+        type: number
+        description: Id of Led
+      isOn:
+        type: boolean
+        description: State of Led on/off
+  Error:
+    type: object
+    required:
+      - error
+    properties:
+      error: 
+        type: string
+        description: Error message
+  Servo:
+    type: object
+    properties:
+      id:
+        type: number
+        description: Id of Servo
+      pin:
+        type: number
+        description: The PWM pin of the servo is connected to this ESP32 output pin
+      position:
+        type: number
+        description: Current target position of the Led in degree
+      minPwm:
+        type: number
+        description: Minimal PWM value of the Servo
+      maxPwm:
+        type: number
+        description: Maximal PWM value of the Servo
+      minAngle:
+        type: number
+        description: Minimal angle the servo is able to reach
+      maxAngle:
+        type: number
+        description: Maximal angle the servo is able to reach
+    required:
+      - id
+      - pin
+      - position
+      - minPwm
+      - maxPwm
+      - minAngle
+      - maxAngle
+  Led:
+    type: object
+    required:
+      - id
+      - pin
+      - isOn
+    properties:        
+      id:
+        type: number
+        description: Id of Led
+      pin:
+        type: number
+        description: Led is connected to this ESP32 output pin
+      isOn:
+          type: boolean
+          description: State of Led on/off
+  Status:
+    type: object
+    required:
+      - leds
+      - servos
+    properties:
+      leds:
+        type: array
+        items:
+          $ref: '#/schemas/Led'
+        description: List of all Leds
+      servos:
+        type: array
+        items:
+          $ref: '#/schemas/Servo'
+        description: List of all Servos
+  ServoPosition:
+    type: object
+    required: 
+      - id
+      - position
+    properties:
+      id:
+        type: number
+        description: Id of Servo
+      position:
+        type: number
+        description: Target position of the servos in degree
+  MotionSpeed:
+    type: object
+    required: true
+    properties:
+      speed:
+        type: number
+        description: Speed of the motion
+  MotionMode:
+    type: object
+    required: true
+    properties:
+      mode:
+        type: string
+        enum:
+          - player
+          - remote_control
+          - idle
+        description: The mode of the motion player running on the esp32

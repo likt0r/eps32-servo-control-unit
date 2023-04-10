@@ -51,9 +51,7 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
                 });
    server_p->on(
        "api/wifi/credentials", HTTP_PUT,
-       [](AsyncWebServerRequest *request) {
-          request->send(200, "application/json", "{\"message\":\"OK\"}");
-       },
+       [](AsyncWebServerRequest *request) { request->send(204); },
        [wifiManager](AsyncWebServerRequest *request, const String &filename,
                      size_t index, uint8_t *data, size_t len, bool final) {
           if (!final) return;
@@ -90,7 +88,7 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
 
           if (hasLed) {
              digitalWrite(outputs_p->getLedPin(id), isOn ? HIGH : LOW);
-             request->send(200, "application/json", "{\"success\":true}");
+             request->send(204);
 
           } else {
              std::string errorStr = "{\"error\":\"Led with ID " +
@@ -126,7 +124,7 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
           bool hasServo =
               remoteControlTarget_p->setServoPositionById(id, position);
           if (hasServo) {
-             request->send(200, "application/json", "{\"success\":true}");
+             request->send(204);
           } else {
              std::string errorStr = "{\"error\":\"Servo with ID " +
                                     std::to_string(id) + " not found\"}";
@@ -160,10 +158,9 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
           }
 
           float speed = jsonObj["speed"];
-          float position = jsonObj["position"];
 
           remoteControlTarget_p->speed = speed;
-          request->send(200, "application/json", "{\"success\":true}");
+          request->send(204);
        }));
    server_p->on("/api/motion/mode", HTTP_OPTIONS,
                 [](AsyncWebServerRequest *request) {
@@ -174,7 +171,7 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
        [motionMode](AsyncWebServerRequest *request, JsonVariant &json) {
           Serial.println("/api/motion/mode");
           if (*motionMode == STARTUP) {
-             request->send(500, "application/json",
+             request->send(400, "application/json",
                            "{\"error\":\"Systems Starts up try again later\"}");
              return;
           }
@@ -198,6 +195,6 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
              request->send(400, "application/json", errorStr.c_str());
              return;
           }
-          request->send(200, "application/json", "{\"success\":true}");
+          request->send(204);
        }));
 };

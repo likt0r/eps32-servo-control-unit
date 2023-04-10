@@ -1,0 +1,22 @@
+
+openapi: 3.0.0
+info:
+  title: WiFi Credentials API
+  description: An API to manage WiFi credentials
+  version: 1.0.0
+servers:
+  - url: 'https://192.168.0.4/api/'
+
+paths:
+  /api/led:
+    $ref: 'paths/led.yaml'
+  /api/wifi/credentials:
+    $ref: 'paths/wifi-credentials.yaml' 
+  /api/status:
+    $ref: 'paths/status.yaml'
+  /api/motion/position:
+    $ref: 'paths/motion-position.yaml'  
+  /api/motion/speed:
+    $ref: 'paths/motion-speed.yaml'  
+  /api/motion/mode:
+    $ref: 'paths/motion-mode.yaml'  

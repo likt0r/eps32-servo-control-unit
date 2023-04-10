@@ -1,0 +1,20 @@
+put:
+  summary: Turn on/off Led
+  operationId: updateLedStatus
+  requestBody:
+    description: Turn Led on or off
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: '../components.yaml#/schemas/LedStatus'
+  responses:
+    '204':
+      description: WiFi credential added successfully
+    '400':
+      description: Error something went wrong, f.e. Led with Id not found
+      content:
+        application/json:
+          schema:
+              $ref: '../components.yaml#/schemas/Error'
