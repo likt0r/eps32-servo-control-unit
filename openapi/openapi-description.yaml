@@ -14,9 +14,9 @@ paths:
     $ref: 'paths/wifi-credentials.yaml' 
   /api/status:
     $ref: 'paths/status.yaml'
-  /api/motion/position:
-    $ref: 'paths/motion-position.yaml'  
   /api/motion/speed:
     $ref: 'paths/motion-speed.yaml'  
+  /api/motion/position:
+    $ref: 'paths/motion-position.yaml'  
   /api/motion/mode:
     $ref: 'paths/motion-mode.yaml'  

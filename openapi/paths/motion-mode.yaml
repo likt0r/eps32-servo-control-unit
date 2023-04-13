@@ -3,8 +3,7 @@ put:
   operationId: updateServoPosition
   requestBody:
     description: Set target position of a servo will work only in remote_control mode
-    required: 
-      - mode
+    required: true
     content:
       application/json:
         schema:

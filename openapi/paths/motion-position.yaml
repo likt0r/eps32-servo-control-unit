@@ -7,7 +7,7 @@ put:
     content:
       application/json:
         schema:
-          type: Object
+          type: object
           $ref: '../components.yaml#/schemas/ServoPosition'
   responses:
     '204':
