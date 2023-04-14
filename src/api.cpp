@@ -49,14 +49,15 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
                 request->send(400);  // Bad request
                 return;
              }
-             Serial.println(obj["ssid"].as<String>().c_str());
-             Serial.println(obj["password"].as<String>().c_str());
-             credentials.push_back({obj["ssid"].as<String>().c_str(),
-                                    obj["password"].as<String>().c_str()});
+             // Create new char arrays for the SSID and password
+
+             // Copy the values from the String objects to the char arrays
+             const String ssid = obj["ssid"].as<String>();
+             const String password = obj["password"].as<String>();
+             credentials.push_back({ssid, password});
           }
 
-          wifiManager_p->setCredentials(credentials);
-          wifiManager_p->saveCredentials();
+          wifiManager_p->setCredentials(&credentials);
           request->send(204);  // No content
        }));
    server_p->on(

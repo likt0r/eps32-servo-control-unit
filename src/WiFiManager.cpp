@@ -17,7 +17,8 @@ void WiFiManager::setup(int timeout, const WiFiCredentials* apCredential) {
       Serial.print(" with password ");
       Serial.println(cred.password);
 
-      WiFi.begin(cred.ssid, cred.password);
+      WiFi.begin(cred.ssid.c_str(), cred.password.c_str());
+
       unsigned long startAttemptTime = millis();
       while (WiFi.status() != WL_CONNECTED &&
              millis() - startAttemptTime < _timeout) {
@@ -55,9 +56,17 @@ IPAddress WiFiManager::getLocalIP() { return WiFi.localIP(); }
 bool WiFiManager::isAccessPoint() { return _accessPointMode; }
 
 void WiFiManager::setCredentials(
-    const std::vector<WiFiCredentials>& credentials) {
-   this->_credentials = credentials;
+    const std::vector<WiFiCredentials>* credentials_p) {
+   this->_credentials = *credentials_p;
    Serial.println("Credentials set.");
+
+   // Save credentials to SPIFFS
+   saveCredentials();
+   // Print all credentials
+   Serial.println("All credentials:");
+   for (const auto& cred : _credentials) {
+      Serial.printf("SSID: %s, Password: %s\n", cred.ssid, cred.password);
+   }
 }
 
 void WiFiManager::removeCredential(int index) {
@@ -67,58 +76,48 @@ void WiFiManager::removeCredential(int index) {
 }
 
 void WiFiManager::saveCredentials() {
-   if (!SPIFFS.begin()) {
+   if (!SPIFFS.begin(true)) {
       Serial.println("Failed to mount file system");
       return;
    }
 
-   File file = SPIFFS.open("/wifi_credentials.txt");
+   File file = SPIFFS.open("/wifi_credentials.txt", "w");
    if (!file) {
-      Serial.println("Credentials file not found, creating a new one");
-      file = SPIFFS.open("/wifi_credentials.txt", "w");
-      if (!file) {
-         Serial.println("Failed to create credentials file");
-         return;
-      }
-      file.close();
+      Serial.println("Failed to create credentials file");
       return;
    }
 
    for (const auto& cred : _credentials) {
-      file.printf("%s:%s\n", cred.ssid, cred.password);
+      file.printf(("" + cred.ssid + ":" + cred.password).c_str());
    }
 
    file.close();
 }
 
 void WiFiManager::loadCredentials() {
-   if (!SPIFFS.begin()) {
+   if (!SPIFFS.begin(true)) {
       Serial.println("Failed to mount file system");
       return;
    }
-   File file = SPIFFS.open("/wifi_credentials.txt");
+
+   File file = SPIFFS.open("/wifi_credentials.txt", "r");
    if (!file) {
-      Serial.println("loadCredentials: Credentials file not found");
+      Serial.println("Credentials file not found");
       return;
-   } else {
-      Serial.println("loadCredentials: Credentials file found");
    }
 
    _credentials.clear();
 
    while (file.available()) {
       String line = file.readStringUntil('\n');
-      Serial.print("read line:");
-      Serial.println(line);
       int separatorIndex = line.indexOf(':');
       if (separatorIndex == -1) continue;
 
       String ssid = line.substring(0, separatorIndex);
       String password = line.substring(separatorIndex + 1);
 
-      _credentials.push_back({ssid.c_str(), password.c_str()});
+      _credentials.push_back({ssid, password});
    }
-   _credentials.push_back({"Sauf-Lan", "gpun94$_/W"});
 
    file.close();
 }

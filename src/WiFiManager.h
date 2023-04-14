@@ -3,11 +3,12 @@
 
 #include <FS.h>
 
+#include <string>
 #include <vector>
 
 struct WiFiCredentials {
-   const char* ssid;
-   const char* password;
+   String ssid;
+   String password;
 };
 
 class WiFiManager {
@@ -17,12 +18,12 @@ class WiFiManager {
    bool isConnected();
    IPAddress getLocalIP();
    bool isAccessPoint();
-   void addCredential(const char* ssid, const char* password);
+   void addCredential(String ssid, String password);
    void removeCredential(int index);
    void saveCredentials();
    void loadCredentials();
    const std::vector<WiFiCredentials>& getCredentials() const;
-   void setCredentials(const std::vector<WiFiCredentials>& credentials);
+   void setCredentials(const std::vector<WiFiCredentials>* credentials_p);
 
    std::vector<WiFiCredentials> _credentials;
    int _timeout;

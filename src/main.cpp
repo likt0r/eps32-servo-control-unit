@@ -149,7 +149,7 @@ void setup() {
    //    }
 
    wifiManager.loadCredentials();
-   wifiManager.setup(6000, &apCredentials);
+   wifiManager.setup(10000, &apCredentials);
 
    // Print ESP Local IP Address
 
