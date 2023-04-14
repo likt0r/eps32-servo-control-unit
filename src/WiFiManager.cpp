@@ -5,12 +5,12 @@
 
 WiFiManager::WiFiManager() {}
 
-void WiFiManager::setup(int timeout, const WiFiCredentials* apCredential) {
+void WiFiManager::setup(int timeout, const WiFiCredentials *apCredential) {
    _timeout = timeout;
    _apCredentials = apCredential;
    WiFi.mode(WIFI_STA);
    loadCredentials();
-   for (const auto& cred : _credentials) {
+   for (const auto &cred : _credentials) {
       // print wifi credentials
       Serial.print("Connecting to ");
       Serial.print(cred.ssid);
@@ -56,7 +56,7 @@ IPAddress WiFiManager::getLocalIP() { return WiFi.localIP(); }
 bool WiFiManager::isAccessPoint() { return _accessPointMode; }
 
 void WiFiManager::setCredentials(
-    const std::vector<WiFiCredentials>* credentials_p) {
+    const std::vector<WiFiCredentials> *credentials_p) {
    this->_credentials = *credentials_p;
    Serial.println("Credentials set.");
 
@@ -64,7 +64,7 @@ void WiFiManager::setCredentials(
    saveCredentials();
    // Print all credentials
    Serial.println("All credentials:");
-   for (const auto& cred : _credentials) {
+   for (const auto &cred : _credentials) {
       Serial.printf("SSID: %s, Password: %s\n", cred.ssid, cred.password);
    }
 }
@@ -76,52 +76,102 @@ void WiFiManager::removeCredential(int index) {
 }
 
 void WiFiManager::saveCredentials() {
-   if (!SPIFFS.begin(true)) {
+   if (!SPIFFS.begin()) {
       Serial.println("Failed to mount file system");
       return;
    }
 
-   File file = SPIFFS.open("/wifi_credentials.txt", "w");
+   File file = SPIFFS.open("/wifi_credentials.bin", FILE_WRITE);
    if (!file) {
-      Serial.println("Failed to create credentials file");
+      Serial.println("Failed to open file for writing");
       return;
    }
 
-   for (const auto& cred : _credentials) {
-      file.printf(("" + cred.ssid + ":" + cred.password).c_str());
+   // Write the number of credentials to the file
+   size_t count = _credentials.size();
+   file.write(reinterpret_cast<const uint8_t *>(&count), sizeof(count));
+
+   // Write each credential to the file
+   Serial.printf("Writing %d credentials to file", count);
+
+   for (const auto &cred : _credentials) {
+      size_t ssidLength = cred.ssid.length();
+      size_t passwordLength = cred.password.length();
+
+      // Write the length of the ssid and password to the file
+      file.write(reinterpret_cast<const uint8_t *>(&ssidLength),
+                 sizeof(ssidLength));
+      file.write(reinterpret_cast<const uint8_t *>(&passwordLength),
+                 sizeof(passwordLength));
+
+      // Write the ssid and password to the file
+      file.write(reinterpret_cast<const uint8_t *>(cred.ssid.c_str()),
+                 ssidLength);
+      file.write(reinterpret_cast<const uint8_t *>(cred.password.c_str()),
+                 passwordLength);
    }
 
    file.close();
 }
 
 void WiFiManager::loadCredentials() {
-   if (!SPIFFS.begin(true)) {
+   if (!SPIFFS.begin()) {
       Serial.println("Failed to mount file system");
       return;
    }
 
-   File file = SPIFFS.open("/wifi_credentials.txt", "r");
+   File file = SPIFFS.open("/wifi_credentials.bin", FILE_READ);
    if (!file) {
-      Serial.println("Credentials file not found");
+      Serial.println("Failed to open file for reading");
       return;
    }
 
+   if (file.size() == 0) {
+      Serial.println("File is empty");
+
+      return;
+   }
+
+   // Read the number of credentials from the file
+   size_t count;
+   file.read(reinterpret_cast<uint8_t *>(&count), sizeof(count));
+
    _credentials.clear();
+   _credentials.reserve(count);
 
-   while (file.available()) {
-      String line = file.readStringUntil('\n');
-      int separatorIndex = line.indexOf(':');
-      if (separatorIndex == -1) continue;
+   // Read each credential from the file
+   // Read each credential from the file
+   for (size_t i = 0; i < count; ++i) {
+      size_t ssidLength, passwordLength;
 
-      String ssid = line.substring(0, separatorIndex);
-      String password = line.substring(separatorIndex + 1);
+      // Read the length of the ssid and password from the file
+      file.read(reinterpret_cast<uint8_t *>(&ssidLength), sizeof(ssidLength));
+      file.read(reinterpret_cast<uint8_t *>(&passwordLength),
+                sizeof(passwordLength));
 
-      _credentials.push_back({ssid, password});
+      // Allocate memory for the ssid and password strings
+      char *ssidBuf = new char[ssidLength + 1];
+      char *passwordBuf = new char[passwordLength + 1];
+
+      // Read the ssid and password from the file
+      file.read(reinterpret_cast<uint8_t *>(ssidBuf), ssidLength);
+      file.read(reinterpret_cast<uint8_t *>(passwordBuf), passwordLength);
+
+      // Null-terminate the strings
+      ssidBuf[ssidLength] = '\0';
+      passwordBuf[passwordLength] = '\0';
+
+      // Construct the WiFiCredentials struct with the ssid and password strings
+      _credentials.emplace_back(WiFiCredentials{ssidBuf, passwordBuf});
+
+      // Free the memory allocated for the ssid and password strings
+      delete[] ssidBuf;
+      delete[] passwordBuf;
    }
 
    file.close();
 }
 
-const std::vector<WiFiCredentials>& WiFiManager::getCredentials() const {
+const std::vector<WiFiCredentials> &WiFiManager::getCredentials() const {
    return _credentials;
 }
