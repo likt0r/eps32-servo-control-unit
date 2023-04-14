@@ -3,7 +3,7 @@ import { defineComponent, ComponentPublicInstance, ref } from "vue";
 import apiInstance from "@/Api";
 import { nanoid } from "nanoid";
 import { Servo, MotionMode, MotionSequence, Keyframe } from "@/Api";
-import MotionSequenceComponent from "@/components/MotionSequence.vue";
+import MotionSequenceComponent from "../components/MotionSequence.vue";
 import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
 
 interface IInstance extends ComponentPublicInstance {

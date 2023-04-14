@@ -51,7 +51,7 @@ import { onBeforeUpdate } from "@vue/runtime-core";
 import { defineEmits, defineProps, ref } from "vue";
 import { mdiPlusThick, mdiEye, mdiEyeOff } from "@mdi/js";
 import { SubmitEventPromise } from "vuetify/lib/framework.mjs";
-import { isRequired } from "@/form";
+import { isRequired } from "../form";
 const props = defineProps({
    ssid: {
       type: String,

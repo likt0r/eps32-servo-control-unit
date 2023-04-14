@@ -78,9 +78,36 @@
    </v-row>
 </template>
 
-<script setup lang="ts">
-import { ref } from "vue";
+<script lang="ts">
+import { defineComponent, ComponentPublicInstance, ref } from "vue";
+import apiService from "@/ApiService";
+import { WifiCredential } from "@/ApiService";
 import draggable from "vuedraggable";
+import { nanoid } from "nanoid";
+import SsidCredentialsDialog from "@/components/SsidCredentialsDialog.vue";
+
+interface IInstance extends ComponentPublicInstance {
+   setViewData(data: WifiCredential[]): void;
+}
+
+export default defineComponent({
+   async beforeRouteEnter(to, from, next) {
+      try {
+         const wifiCredentials = (await apiService.getWifiCredentials()).data;
+
+         next((vm) => {
+            const instance = vm as IInstance;
+            instance.setViewData(wifiCredentials);
+         });
+      } catch (error) {
+         console.log("error", error);
+         next(false);
+      }
+   },
+});
+</script>
+
+<script setup lang="ts">
 import {
    mdiDragHorizontalVariant,
    mdiDelete,
@@ -88,19 +115,14 @@ import {
    mdiEye,
    mdiEyeOff,
 } from "@mdi/js";
-import SsidCredentialsDialog from "@/components/SsidCredentialsDialog.vue";
 
-interface Credential {
-   ssid: string;
-   password: string;
+const credentials = ref<WifiCredential[]>([]);
+
+function setViewData(data: WifiCredential[]) {
+   credentials.value = data;
 }
 
 // const Draggable = draggable.default;
-const credentials = ref<Credential[]>([
-   { ssid: "SSID1", password: "password1" },
-   { ssid: "SSID2", password: "password2" },
-   { ssid: "SSID3", password: "password3" },
-]);
 
 const dragOptions = ref({
    animation: 200,

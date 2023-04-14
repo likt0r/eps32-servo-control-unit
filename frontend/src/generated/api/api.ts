@@ -306,7 +306,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -326,7 +326,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Set tMotion speed
+         * @summary Set Motion speed
          * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -342,7 +342,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -378,7 +378,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -414,7 +414,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -450,7 +450,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -511,7 +511,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Set tMotion speed
+         * @summary Set Motion speed
          * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -593,7 +593,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Set tMotion speed
+         * @summary Set Motion speed
          * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -677,7 +677,7 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary Set tMotion speed
+     * @summary Set Motion speed
      * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
