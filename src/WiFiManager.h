@@ -22,10 +22,9 @@ class WiFiManager {
    void saveCredentials();
    void loadCredentials();
    const std::vector<WiFiCredentials>& getCredentials() const;
-   void WiFiManager::setCredentials(
-       const std::vector<WiFiCredentials>& credentials)
+   void setCredentials(const std::vector<WiFiCredentials>& credentials);
 
-       private : std::vector<WiFiCredentials> _credentials;
+   std::vector<WiFiCredentials> _credentials;
    int _timeout;
    bool _accessPointMode;
    const WiFiCredentials* _apCredentials;

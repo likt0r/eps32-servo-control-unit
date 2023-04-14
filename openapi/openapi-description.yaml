@@ -5,7 +5,7 @@ info:
   description: An API to manage WiFi credentials
   version: 1.0.0
 servers:
-  - url: 'https://192.168.0.4/api/'
+  - url: 'http://192.168.0.93/'
 
 paths:
   /api/led:

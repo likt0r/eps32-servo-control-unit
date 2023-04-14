@@ -8,36 +8,14 @@
 #include "motion/remote.h"
 #include "outputs.h"
 
-void handleCredentialsSetRequest(AsyncWebServerRequest *request,
-                                 JsonVariant &json, WiFiManager *wifiManager) {
-   if (!json.is<JsonArray>()) {
-      request->send(400);  // Bad request
-      return;
-   }
-
-   std::vector<WiFiCredentials> credentials;
-   for (const auto &cred : json.as<JsonArray>()) {
-      if (!cred.containsKey("ssid") || !cred.containsKey("password")) {
-         request->send(400);  // Bad request
-         return;
-      }
-      credentials.push_back(
-          {cred["ssid"].as<char *>(), cred["password"].as<char *>()});
-   }
-
-   wifiManager->setCredentials(credentials);
-   wifiManager->saveCredentials();
-   request->send(204);  // No content
-}
-
 void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
               RemoteControlTarget *remoteControlTarget_p,
-              MotionMode *motionMode, WiFiManager *wifiManager) {
+              MotionMode *motionMode, WiFiManager *wifiManager_p) {
    server_p->on("/api/wifi/credentials", HTTP_GET,
-                [wifiManager](AsyncWebServerRequest *request) {
+                [wifiManager_p](AsyncWebServerRequest *request) {
                    Serial.println("GET /api/wifi-credentials");
                    String credentialsJson = "[";
-                   for (const auto &cred : wifiManager->getCredentials()) {
+                   for (const auto &cred : wifiManager_p->getCredentials()) {
                       credentialsJson += "{\"ssid\":\"" + String(cred.ssid) +
                                          "\",\"password\":\"" +
                                          String(cred.password) + "\"},";
@@ -49,30 +27,44 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
                    credentialsJson += "]";
                    request->send(200, "application/json", credentialsJson);
                 });
-   server_p->on(
-       "api/wifi/credentials", HTTP_PUT,
-       [](AsyncWebServerRequest *request) { request->send(204); },
-       [wifiManager](AsyncWebServerRequest *request, const String &filename,
-                     size_t index, uint8_t *data, size_t len, bool final) {
-          if (!final) return;
-          StaticJsonDocument<1024> doc;
-          DeserializationError error = deserializeJson(doc, data, len);
-          if (error) {
-             request->send(400);  // Bad request
-             return;
+   server_p->on("/api/wifi/credentials", HTTP_OPTIONS,
+                [](AsyncWebServerRequest *request) {
+                   Serial.println("OPTIONS /api/wifi/credentials");
+                   request->send(200, "text/plain", "");
+                });
+   server_p->addHandler(new AsyncCallbackJsonWebHandler(
+       "/api/wifi/credentials",
+       [wifiManager_p](AsyncWebServerRequest *request, JsonVariant &json) {
+          Serial.println("POST /api/wifi/credentials");
+          JsonArray const &payload = json.as<JsonArray>();
+
+          std::vector<WiFiCredentials> credentials;
+          for (const auto &cred : payload) {
+             if (!cred.is<JsonObject>()) {
+                request->send(400);  // Bad request
+                return;
+             }
+             JsonObject const &obj = cred.as<JsonObject>();
+             if (!obj.containsKey("ssid") || !obj.containsKey("password")) {
+                request->send(400);  // Bad request
+                return;
+             }
+             Serial.println(obj["ssid"].as<String>().c_str());
+             Serial.println(obj["password"].as<String>().c_str());
+             credentials.push_back({obj["ssid"].as<String>().c_str(),
+                                    obj["password"].as<String>().c_str()});
           }
-          handleCredentialsSetRequest(request, doc.as<JsonVariant>(),
-                                      wifiManager);
-       });
+
+          wifiManager_p->setCredentials(credentials);
+          wifiManager_p->saveCredentials();
+          request->send(204);  // No content
+       }));
    server_p->on(
        "/api/status", HTTP_GET, [outputs_p](AsyncWebServerRequest *request) {
           Serial.println("/api/status");
           request->send(200, "application/json", outputs_p->outputToJson());
        });
 
-   //    server.on("/api/led", HTTP_GET, [](AsyncWebServerRequest *request) {
-   //       request->send(200, "application/json", outputToJson());
-   //    });
    server_p->on("/api/led", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
       request->send(200, "text/plain", "");
    });
@@ -95,8 +87,6 @@ void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
                                     std::to_string(id) + " not found\"}";
              request->send(400, "application/json", errorStr.c_str());
           }
-
-          // ...
        }));
    server_p->on("/api/motion/position", HTTP_OPTIONS,
                 [](AsyncWebServerRequest *request) {

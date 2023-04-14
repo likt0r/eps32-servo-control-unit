@@ -25,17 +25,14 @@
 const char *ssid = "ALM4OG_RPT";
 const char *password = "domn8udomn8u2domn8u3";
 
-// WiFi Credentials
-const int NUM_WIFI_NETWORKS = 2;
-WiFiCredentials wifiCredentials[NUM_WIFI_NETWORKS] = {};
-
 WiFiCredentials apCredentials = {"MotionController", "password"};
 
 WiFiManager wifiManager = WiFiManager();
 
 // Servorboard
 // called this way, it uses the default address 0x40
-Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
+
+// Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40);
 
 // Depending on your servo make, the pulse width min and max may vary, you
 // want these to be as small/large as possible without hitting the hard stop
@@ -150,8 +147,9 @@ void setup() {
    //       delay(1000);
    //       Serial.println("Connecting to WiFi");
    //    }
+
    wifiManager.loadCredentials();
-   wifiManager.setup(5000, &apCredentials);
+   wifiManager.setup(6000, &apCredentials);
 
    // Print ESP Local IP Address
 
@@ -207,8 +205,8 @@ void setup() {
    // Servo Stuff
    Serial.println("32 channel Servo test!");
    outputs.print();
-   board1.begin();
-   board1.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+   // board1.begin();
+   // board1.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
    // Start Hardware Timer loop
    pinMode(CYCLE_PIN, OUTPUT);  // Set loop debug pin as output

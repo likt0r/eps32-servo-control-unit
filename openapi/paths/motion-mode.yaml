@@ -1,4 +1,4 @@
-put:
+post:
   summary: Set target servo position
   operationId: updateServoPosition
   requestBody:

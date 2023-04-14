@@ -9,7 +9,7 @@ void WiFiManager::setup(int timeout, const WiFiCredentials* apCredential) {
    _timeout = timeout;
    _apCredentials = apCredential;
    WiFi.mode(WIFI_STA);
-
+   loadCredentials();
    for (const auto& cred : _credentials) {
       // print wifi credentials
       Serial.print("Connecting to ");
@@ -26,6 +26,7 @@ void WiFiManager::setup(int timeout, const WiFiCredentials* apCredential) {
       if (WiFi.status() == WL_CONNECTED) {
          break;
       }
+      delay(500);
    }
 
    if (WiFi.status() != WL_CONNECTED) {
@@ -55,12 +56,13 @@ bool WiFiManager::isAccessPoint() { return _accessPointMode; }
 
 void WiFiManager::setCredentials(
     const std::vector<WiFiCredentials>& credentials) {
-   _credentials = credentials;
+   this->_credentials = credentials;
+   Serial.println("Credentials set.");
 }
 
 void WiFiManager::removeCredential(int index) {
    if (index >= 0 && index < _credentials.size()) {
-      _credentials.erase(_credentials.begin() + index);
+      this->_credentials.erase(_credentials.begin() + index);
    }
 }
 
@@ -70,7 +72,7 @@ void WiFiManager::saveCredentials() {
       return;
    }
 
-   File file = SPIFFS.open("/wifi_credentials.txt", "w");
+   File file = SPIFFS.open("/wifi_credentials.txt");
    if (!file) {
       Serial.println("Credentials file not found, creating a new one");
       file = SPIFFS.open("/wifi_credentials.txt", "w");
@@ -94,8 +96,7 @@ void WiFiManager::loadCredentials() {
       Serial.println("Failed to mount file system");
       return;
    }
-
-   File file = SPIFFS.open("/wifi_credentials.txt", "r");
+   File file = SPIFFS.open("/wifi_credentials.txt");
    if (!file) {
       Serial.println("loadCredentials: Credentials file not found");
       return;
@@ -107,6 +108,8 @@ void WiFiManager::loadCredentials() {
 
    while (file.available()) {
       String line = file.readStringUntil('\n');
+      Serial.print("read line:");
+      Serial.println(line);
       int separatorIndex = line.indexOf(':');
       if (separatorIndex == -1) continue;
 
@@ -115,6 +118,7 @@ void WiFiManager::loadCredentials() {
 
       _credentials.push_back({ssid.c_str(), password.c_str()});
    }
+   _credentials.push_back({"Sauf-Lan", "gpun94$_/W"});
 
    file.close();
 }

@@ -1,4 +1,4 @@
-put:
+post:
   summary: Turn on/off Led
   operationId: updateLedStatus
   requestBody:

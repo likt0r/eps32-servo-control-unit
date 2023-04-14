@@ -1,5 +1,5 @@
-put:
-  summary: Set tMotion speed 
+post:
+  summary: Set Motion speed 
   operationId: updateMotionSpeed
   requestBody:
     description: Set target motion speed of all servos, will work only in remote_control mode
