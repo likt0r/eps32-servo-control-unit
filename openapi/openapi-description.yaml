@@ -6,6 +6,10 @@ info:
   version: 1.0.0
 servers:
   - url: 'http://192.168.0.93/'
+  - url: 'http://192.168.4.1/'
+  - url: 'http://192.168.178.181/'
+
+  
 
 paths:
   /api/led:

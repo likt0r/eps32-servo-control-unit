@@ -45,7 +45,8 @@ void WiFiManager::setup(int timeout, const WiFiCredentials *apCredential) {
       WiFi.softAPConfig(ip, gateway, subnet);
       WiFi.softAPsetHostname("myESP32");  // Set the hostname of the ESP32
 
-      WiFi.softAP(_apCredentials->ssid, _apCredentials->password);
+      WiFi.softAP(_apCredentials->ssid.c_str(),
+                  _apCredentials->password.c_str());
    }
 }
 
