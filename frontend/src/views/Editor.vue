@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
-import { nanoid } from "nanoid";
-import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
+import { ref } from "vue";
 import throttle from "lodash/throttle";
-
-import MotionSequenceComponent from "@/components/MotionSequence.vue";
+import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
+import ViewWrapper from "@/components/ViewWrapper.vue";
 import apiService from "@/ApiService";
 import { Servo, MotionModeModeEnum } from "@/ApiService";
 
@@ -58,63 +56,65 @@ const onMotionSpeedUpdate = throttle(async (speed: number) => {
 </script>
 
 <template>
-   <v-card flat>
-      <v-card-text>
-         <v-container fluid>
-            <!-- <MotionSequenceComponent :sequence="currentMotionSequence" /> -->
-            <v-row>
-               <v-col cols="12" sm="10" md="10">
-                  <div class="text-caption">
-                     Motion Speed: {{ motionSpeed }}
-                  </div>
+   <ViewWrapper>
+      <v-card flat>
+         <v-card-text>
+            <v-container fluid>
+               <!-- <MotionSequenceComponent :sequence="currentMotionSequence" /> -->
+               <v-row>
+                  <v-col cols="12" sm="10" md="10">
+                     <div class="text-caption">
+                        Motion Speed: {{ motionSpeed }}
+                     </div>
 
-                  <v-slider
-                     density="compact"
-                     v-model="motionSpeed"
-                     :min="0"
-                     :max="5"
-                     :step="0.01"
-                     color="secondary"
-                     @update:model-value="onMotionSpeedUpdate"
-                     thumb-label
-                     :prepend-icon="mdiSpeedometer"
-                  ></v-slider>
-               </v-col>
-               <v-col cols="12" sm="2" md="2">
-                  <v-text-field
-                     v-model="motionSpeed"
-                     type="number"
-                     :step="0.05"
-                     variant="outlined"
-                     hide-details="auto"
-                  ></v-text-field>
-               </v-col>
-            </v-row>
-            <v-row v-for="(servo, index) in servos" :key="servo.id">
-               <v-col cols="12" sm="10" md="10">
-                  <div class="text-caption">Servo Pin: {{ servo.pin }}</div>
+                     <v-slider
+                        density="compact"
+                        v-model="motionSpeed"
+                        :min="0"
+                        :max="5"
+                        :step="0.01"
+                        color="secondary"
+                        @update:model-value="onMotionSpeedUpdate"
+                        thumb-label
+                        :prepend-icon="mdiSpeedometer"
+                     ></v-slider>
+                  </v-col>
+                  <v-col cols="12" sm="2" md="2">
+                     <v-text-field
+                        v-model="motionSpeed"
+                        type="number"
+                        :step="0.05"
+                        variant="outlined"
+                        hide-details="auto"
+                     ></v-text-field>
+                  </v-col>
+               </v-row>
+               <v-row v-for="(servo, index) in servos" :key="servo.id">
+                  <v-col cols="12" sm="10" md="10">
+                     <div class="text-caption">Servo Pin: {{ servo.pin }}</div>
 
-                  <v-slider
-                     v-model="servo.position"
-                     :min="servo.minAngle"
-                     :max="servo.maxAngle"
-                     :step="0.1"
-                     color="primary"
-                     thumb-label
-                     @update:model-value="onPositionUpdate(servo.id, $event)"
-                     :prepend-icon="mdiAngleAcute"
-                  ></v-slider>
-               </v-col>
-               <v-col cols="12" sm="2" md="2">
-                  <v-text-field
-                     v-model="servo.position"
-                     type="number"
-                     variant="outlined"
-                     hide-details="auto"
-                  ></v-text-field>
-               </v-col>
-            </v-row>
-         </v-container>
-      </v-card-text>
-   </v-card>
+                     <v-slider
+                        v-model="servo.position"
+                        :min="servo.minAngle"
+                        :max="servo.maxAngle"
+                        :step="0.1"
+                        color="primary"
+                        thumb-label
+                        @update:model-value="onPositionUpdate(servo.id, $event)"
+                        :prepend-icon="mdiAngleAcute"
+                     ></v-slider>
+                  </v-col>
+                  <v-col cols="12" sm="2" md="2">
+                     <v-text-field
+                        v-model="servo.position"
+                        type="number"
+                        variant="outlined"
+                        hide-details="auto"
+                     ></v-text-field>
+                  </v-col>
+               </v-row>
+            </v-container>
+         </v-card-text>
+      </v-card>
+   </ViewWrapper>
 </template>

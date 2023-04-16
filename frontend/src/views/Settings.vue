@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineComponent, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import draggable from "vuedraggable";
 import {
    mdiDragHorizontalVariant,
@@ -9,6 +9,7 @@ import {
    mdiEyeOff,
 } from "@mdi/js";
 import SsidCredentialsDialog from "@/components/SsidCredentialsDialog.vue";
+import ViewWrapper from "@/components/ViewWrapper.vue";
 import apiService from "@/ApiService";
 import { WifiCredential } from "@/ApiService";
 import useAppStore from "@/store/app";
@@ -71,105 +72,107 @@ onMounted(async () => {
 });
 </script>
 <template>
-   <v-row no-gutters justify="center" cols="12">
-      <v-col xs="12" md="10" lg="8" xl="6" class="pa-2">
-         <v-card>
-            <template v-slot:loader="{ isActive }">
-               <v-progress-linear
-                  :active="loadingCredentials"
-                  color="primary"
-                  height="8"
-                  indeterminate
-               ></v-progress-linear>
-            </template>
-            <v-card-title> WiFi-Credentials </v-card-title>
-            <v-card-text>
-               <v-list>
-                  <transition-group>
-                     <draggable
-                        class="list-group"
-                        item-key="name"
-                        key="dragggable"
-                        :list="credentials"
-                        v-bind="dragOptions"
-                        @start="drag = true"
-                        @end="drag = false"
-                     >
-                        <template #item="{ element: cred, index }">
-                           <v-list-item
-                              :key="cred.ssid"
-                              :title="cred.ssid"
-                              :subtitle="
-                                 showPasswords ? cred.password : '********'
+   <ViewWrapper>
+      <v-row no-gutters justify="center" cols="12">
+         <v-col xs="12" md="10" lg="8" xl="6" class="pa-2">
+            <v-card>
+               <template v-slot:loader="{ isActive }">
+                  <v-progress-linear
+                     :active="loadingCredentials"
+                     color="primary"
+                     height="8"
+                     indeterminate
+                  ></v-progress-linear>
+               </template>
+               <v-card-title> WiFi-Credentials </v-card-title>
+               <v-card-text>
+                  <v-list>
+                     <transition-group>
+                        <draggable
+                           class="list-group"
+                           item-key="name"
+                           key="dragggable"
+                           :list="credentials"
+                           v-bind="dragOptions"
+                           @start="drag = true"
+                           @end="drag = false"
+                        >
+                           <template #item="{ element: cred, index }">
+                              <v-list-item
+                                 :key="cred.ssid"
+                                 :title="cred.ssid"
+                                 :subtitle="
+                                    showPasswords ? cred.password : '********'
+                                 "
+                                 background="surface"
+                              >
+                                 <template v-slot:prepend>
+                                    <v-icon
+                                       class="list-group-item"
+                                       :icon="mdiDragHorizontalVariant"
+                                    ></v-icon>
+                                 </template>
+                                 <template v-slot:append>
+                                    <SsidCredentialsDialog
+                                       :buttonIcon="mdiPencil"
+                                       :ssid="cred.ssid"
+                                       :password="cred.password"
+                                       @save="
+                                          (event) => {
+                                             onChange(
+                                                event.ssid,
+                                                event.password,
+                                                index
+                                             );
+                                          }
+                                       "
+                                    />
+                                    <v-btn
+                                       :icon="mdiDelete"
+                                       variant="text"
+                                       @click="() => onDelete(index)"
+                                    ></v-btn>
+                                 </template>
+                              </v-list-item>
+                           </template>
+                        </draggable>
+                     </transition-group>
+                     <v-list-item background="surface">
+                        <template v-slot:append>
+                           <v-btn
+                              :icon="showPasswords ? mdiEye : mdiEyeOff"
+                              variant="text"
+                              @click="() => (showPasswords = !showPasswords)"
+                           ></v-btn>
+                           <SsidCredentialsDialog
+                              @save="
+                                 (event) => {
+                                    onChange(
+                                       event.ssid,
+                                       event.password,
+                                       undefined
+                                    );
+                                 }
                               "
-                              background="surface"
-                           >
-                              <template v-slot:prepend>
-                                 <v-icon
-                                    class="list-group-item"
-                                    :icon="mdiDragHorizontalVariant"
-                                 ></v-icon>
-                              </template>
-                              <template v-slot:append>
-                                 <SsidCredentialsDialog
-                                    :buttonIcon="mdiPencil"
-                                    :ssid="cred.ssid"
-                                    :password="cred.password"
-                                    @save="
-                                       (event) => {
-                                          onChange(
-                                             event.ssid,
-                                             event.password,
-                                             index
-                                          );
-                                       }
-                                    "
-                                 />
-                                 <v-btn
-                                    :icon="mdiDelete"
-                                    variant="text"
-                                    @click="() => onDelete(index)"
-                                 ></v-btn>
-                              </template>
-                           </v-list-item>
+                           />
                         </template>
-                     </draggable>
-                  </transition-group>
-                  <v-list-item background="surface">
-                     <template v-slot:append>
-                        <v-btn
-                           :icon="showPasswords ? mdiEye : mdiEyeOff"
-                           variant="text"
-                           @click="() => (showPasswords = !showPasswords)"
-                        ></v-btn>
-                        <SsidCredentialsDialog
-                           @save="
-                              (event) => {
-                                 onChange(
-                                    event.ssid,
-                                    event.password,
-                                    undefined
-                                 );
-                              }
-                           "
-                        />
-                     </template>
-                  </v-list-item>
-               </v-list>
-            </v-card-text>
-            <v-card-actions>
-               <v-spacer></v-spacer>
-               <v-btn
-                  @click="onSave"
-                  color="primary"
-                  :disabled="!credentialsChanged || loadingCredentials"
-               >
-                  Save
-               </v-btn>
-            </v-card-actions>
-         </v-card>
-      </v-col>
-   </v-row>
+                     </v-list-item>
+                  </v-list>
+               </v-card-text>
+               <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                     @click="onSave"
+                     color="primary"
+                     :disabled="!credentialsChanged || loadingCredentials"
+                  >
+                     Save
+                  </v-btn>
+               </v-card-actions>
+            </v-card>
+         </v-col>
+      </v-row>
+   </ViewWrapper>
 </template>
 
 <style>

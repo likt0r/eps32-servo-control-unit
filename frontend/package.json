@@ -31,6 +31,7 @@
       "@mdi/js": "^7.1.96",
       "@openapitools/openapi-generator-cli": "^2.5.2",
       "@types/axios": "^0.14.0",
+      "@types/lodash": "^4.14.194",
       "@types/mime-types": "^2.1.1",
       "@types/node": "^18.11.9",
       "@types/vuedraggable": "^2.24.0",
