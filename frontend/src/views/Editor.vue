@@ -1,87 +1,67 @@
-<script lang="ts">
-import { defineComponent, ComponentPublicInstance, ref } from "vue";
-import apiInstance from "@/Api";
-import { nanoid } from "nanoid";
-import { Servo, MotionMode, MotionSequence, Keyframe } from "@/Api";
-import MotionSequenceComponent from "../components/MotionSequence.vue";
-import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
-
-interface IInstance extends ComponentPublicInstance {
-   setViewData(data: Servo[], mode: MotionMode, speed: number): void;
-}
-
-export default defineComponent({
-   async beforeRouteEnter(to, from, next) {
-      try {
-         const data = await apiInstance.getServos();
-         const motionSpeed = await apiInstance.getMotionSpeed();
-         await apiInstance.setMotionMode(MotionMode.Remote_Control);
-         next((vm) => {
-            const instance = vm as IInstance;
-            instance.setViewData(data, MotionMode.Remote_Control, motionSpeed);
-         });
-      } catch (error) {
-         console.log("error", error);
-         next(false);
-      }
-   },
-});
-</script>
-
 <script lang="ts" setup>
+import { onMounted, ref } from "vue";
+import { nanoid } from "nanoid";
+import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
+import throttle from "lodash/throttle";
+
+import MotionSequenceComponent from "@/components/MotionSequence.vue";
+import apiService from "@/ApiService";
+import { Servo, MotionModeModeEnum } from "@/ApiService";
+
+import useAppStore from "@/store/app";
+const { publishAlert } = useAppStore();
+
 const servos = ref<Servo[]>([]);
 const motionSpeed = ref<number>(0.1);
-const motionMode = ref<MotionMode>(MotionMode.Idle);
+const motionMode = ref<MotionModeModeEnum>(MotionModeModeEnum.Idle);
 
-const currentMotionSequence = ref<MotionSequence>(createNewMotionSequence());
+// const currentMotionSequence = ref<MotionSequence>(createNewMotionSequence());
 
-function createNewMotionSequence(): MotionSequence {
-   return {
-      name: "New Motion Sequence",
-      id: nanoid(),
-      loop: false,
-      speedMultiplier: 1,
-      keyframes: new Array<Keyframe>(),
-   };
-}
+// function createNewMotionSequence(): MotionSequence {
+//    return {
+//       name: "New Motion Sequence",
+//       id: nanoid(),
+//       loop: false,
+//       speedMultiplier: 1,
+//       keyframes: new Array<Keyframe>(),
+//    };
+// }
 
-function setViewData(data: Servo[], mode: MotionMode, speed: number) {
-   servos.value = data;
-   motionSpeed.value = speed;
-   motionMode.value = mode;
-}
-
-async function updateLedData() {
+const onPositionUpdate = throttle(async (id: number, position: number) => {
    try {
-      servos.value = await apiInstance.getServos();
+      await apiService.updateServoPosition({
+         id,
+         position,
+      });
    } catch (error) {
       console.log("error", error);
+      publishAlert(
+         "error",
+         "Error updating servo position",
+         JSON.stringify(error)
+      );
    }
-}
-async function onPositionUpdate(id: number, position: number) {
+}, 250);
+
+const onMotionSpeedUpdate = throttle(async (speed: number) => {
    try {
-      await apiInstance.setServoPosition(id, position);
+      await apiService.updateMotionSpeed({ speed });
    } catch (error) {
       console.log("error", error);
+      publishAlert(
+         "error",
+         "Error updating motion speed",
+         JSON.stringify(error)
+      );
    }
-}
-
-async function onMotionSpeedUpdate(speed: number) {
-   try {
-      await apiInstance.setMotionSpeed(speed);
-   } catch (error) {
-      console.log("error", error);
-   }
-}
-
-defineExpose({ setViewData });
+}, 250);
 </script>
 
 <template>
    <v-card flat>
       <v-card-text>
          <v-container fluid>
-            <MotionSequenceComponent :sequence="currentMotionSequence" />
+            <!-- <MotionSequenceComponent :sequence="currentMotionSequence" /> -->
             <v-row>
                <v-col cols="12" sm="10" md="10">
                   <div class="text-caption">

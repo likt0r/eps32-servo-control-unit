@@ -30,8 +30,8 @@ export const useAppStore = defineStore("app", () => {
 
    function publishAlert(
       type: "success" | "error" | "info" | "warning",
-      text: string,
-      title: string
+      title: string,
+      text: string
    ) {
       alertContents.value.push({
          id: nanoid(),

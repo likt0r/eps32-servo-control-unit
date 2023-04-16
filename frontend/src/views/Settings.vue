@@ -59,12 +59,12 @@ onMounted(async () => {
       loadingCredentials.value = true;
       const response = await apiService.getWifiCredentials();
       credentials.value = response.data;
-   } catch (error) {
+   } catch (error: any) {
       console.log("error", error);
       publishAlert(
          "error",
          "Could not load WiFi-Credentials",
-         "Connection Error"
+         JSON.stringify(error)
       );
    }
    loadingCredentials.value = false;

@@ -1,53 +1,41 @@
-<script lang="ts">
-import { defineComponent, ComponentPublicInstance, ref } from "vue";
-import apiInstance from "@/Api";
-import { Led } from "@/Api";
-
-interface IInstance extends ComponentPublicInstance {
-   setLedData(data: Led[]): void;
-}
-
-export default defineComponent({
-   async beforeRouteEnter(to, from, next) {
-      try {
-         const data = await apiInstance.getLeds();
-         next((vm) => {
-            const instance = vm as IInstance;
-            instance.setLedData(data);
-         });
-      } catch (error) {
-         console.log("error", error);
-         next(false);
-      }
-   },
-});
-</script>
-
 <script lang="ts" setup>
-const leds = ref<Led[]>([]);
+import { onMounted, ref } from "vue";
+import apiService from "@/ApiService";
+import { Led } from "@/ApiService";
+import useAppStore from "@/store/app";
+const { publishAlert } = useAppStore();
 
-const setLedData = (data: Led[]) => {
-   leds.value = data;
-   console.log("vue-route::from::", leds);
-};
+const leds = ref<Led[]>([]);
 
 async function updateLedData() {
    try {
-      leds.value = await apiInstance.getLeds();
+      const response = await apiService.getStatus();
+      leds.value = response.data.leds;
    } catch (error) {
       console.log("error", error);
+      publishAlert(
+         "error",
+         "Could not load status data",
+         JSON.stringify(error)
+      );
    }
 }
 async function onSwitchChange(id: number, isOn: boolean | undefined) {
    try {
       if (isOn === undefined) return;
-      await apiInstance.switchLed(id, isOn);
+      const response = await apiService.updateLedStatus({ id, isOn });
    } catch (error) {
       console.log("error", error);
+      publishAlert(
+         "error",
+         `Could not update led ${id} isOn to ${isOn}`,
+         JSON.stringify(error)
+      );
    }
 }
-
-defineExpose({ setLedData });
+onMounted(async () => {
+   await updateLedData();
+});
 </script>
 
 <template>
@@ -60,7 +48,7 @@ defineExpose({ setLedData });
                      v-for="(led, index) in leds"
                      :key="led.id"
                      :label="'Pin ' + led.pin"
-                     color="red"
+                     color="secondary"
                      v-model="led.isOn"
                      @update:model-value="onSwitchChange(led.id, $event)"
                      hide-details
