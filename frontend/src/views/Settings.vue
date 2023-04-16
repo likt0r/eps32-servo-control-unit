@@ -1,33 +1,6 @@
-<script lang="ts">
-import { defineComponent, ComponentPublicInstance, ref } from "vue";
-import apiService from "@/ApiService";
-import { WifiCredential } from "@/ApiService";
-import draggable from "vuedraggable";
-
-import SsidCredentialsDialog from "@/components/SsidCredentialsDialog.vue";
-
-interface IInstance extends ComponentPublicInstance {
-   setSettingsData(data: WifiCredential[]): void;
-}
-
-export default defineComponent({
-   async beforeRouteEnter(to, from, next) {
-      try {
-         const wifiCredentials = (await apiService.getWifiCredentials()).data;
-
-         next((vm) => {
-            const instance = vm as IInstance;
-            instance.setSettingsData(wifiCredentials);
-         });
-      } catch (error) {
-         console.log("error", error);
-         next(false);
-      }
-   },
-});
-</script>
-
 <script lang="ts" setup>
+import { defineComponent, onMounted, ref } from "vue";
+import draggable from "vuedraggable";
 import {
    mdiDragHorizontalVariant,
    mdiDelete,
@@ -35,14 +8,15 @@ import {
    mdiEye,
    mdiEyeOff,
 } from "@mdi/js";
+import SsidCredentialsDialog from "@/components/SsidCredentialsDialog.vue";
+import apiService from "@/ApiService";
+import { WifiCredential } from "@/ApiService";
+import useAppStore from "@/store/app";
+const { publishAlert } = useAppStore();
 
 const credentials = ref<WifiCredential[]>([]);
 const loadingCredentials = ref(false);
 const credentialsChanged = ref(false);
-async function setSettingsData(data: WifiCredential[]) {
-   credentials.value = data;
-   console.log("vue-route::from::", data);
-}
 
 // const Draggable = draggable.default;
 
@@ -79,7 +53,22 @@ const onDelete = (index: number) => {
    credentials.value.splice(index, 1);
    credentialsChanged.value = true;
 };
-defineExpose({ setSettingsData });
+onMounted(async () => {
+   loadingCredentials.value = true;
+   try {
+      loadingCredentials.value = true;
+      const response = await apiService.getWifiCredentials();
+      credentials.value = response.data;
+   } catch (error) {
+      console.log("error", error);
+      publishAlert(
+         "error",
+         "Could not load WiFi-Credentials",
+         "Connection Error"
+      );
+   }
+   loadingCredentials.value = false;
+});
 </script>
 <template>
    <v-row no-gutters justify="center" cols="12">
