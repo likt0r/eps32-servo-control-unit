@@ -1,0 +1,70 @@
+get:
+  summary: Get a posture of a motion by motionId and postureId
+  parameters:
+    - in: path
+      name: motionId
+      required: true
+      schema:
+        type: string
+      description: ID of the motion to retrieve posture from
+    - in: path
+      name: postureId
+      required: true
+      schema:
+        type: string
+      description: ID of the posture to retrieve
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Posture'
+    '404':
+      description: Not Found
+post:
+  summary: Update an existing posture for a motion
+  parameters:
+    - in: path
+      name: motionId
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: postureId
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components.yaml#/schemas/Posture'
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Posture'
+    404:
+      description: Not Found
+delete:
+  summary: Delete an existing posture for a motion
+  parameters:
+    - in: path
+      name: motionId
+      required: true
+      schema:
+        type: string
+    - in: path
+      name: postureId
+      required: true
+      schema:
+        type: string
+  responses:
+    204:
+      description: No content
+    404:
+      description: Not Found

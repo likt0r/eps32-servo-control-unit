@@ -1,0 +1,61 @@
+
+get:
+  summary: Get motion by ID
+  parameters:
+    - in: path
+      name: motionId
+      schema:
+        type: string
+      required: true
+      description: The ID of the motion to retrieve
+  responses:
+    200:
+      description: The requested motion
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Motion'
+    404:
+      description: Motion not found
+    500:
+      description: Internal server error
+post:
+  summary: Update an existing motion
+  parameters:
+    - in: path
+      name: motionId
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components.yaml#/schemas/Motion'
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Motion'
+    404:
+      description: Motion not found
+    500:
+      description: Internal server error
+delete:
+  summary: Delete an existing motion
+  parameters:
+    - in: path
+      name: motionId
+      required: true
+      schema:
+        type: string
+  responses:
+    204:
+      description: No content
+    404:
+      description: Motion not found
+    500:
+      description: Internal server error

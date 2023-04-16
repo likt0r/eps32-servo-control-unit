@@ -1,0 +1,33 @@
+get:
+  summary: List all servos
+  operationId: getServos
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components.yaml#/schemas/Servo'
+
+post:
+  summary: Update a servos
+  operationId: setServos
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../components.yaml#/schemas/Servo'
+  responses:
+    '201':
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Servo'
+
+

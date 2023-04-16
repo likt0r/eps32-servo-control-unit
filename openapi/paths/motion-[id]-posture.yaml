@@ -1,0 +1,31 @@
+get:
+  summary: List all Postures of motion
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Posture'
+post:
+  summary: Create a new posture for a motion
+  parameters:
+    - in: path
+      name: motionId
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components.yaml#/schemas/Posture'
+  responses:
+    201:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Posture'
+

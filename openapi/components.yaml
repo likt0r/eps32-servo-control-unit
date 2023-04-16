@@ -126,3 +126,50 @@ schemas:
           - remote_control
           - idle
         description: The mode of the motion player running on the esp32
+  Posture:
+    type: object
+    properties:
+      name:
+        type: string
+      id:
+        type: string
+      transitionDuration:
+        type: number
+      pauseDuration:
+        type: number
+      targetPositions:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: number
+            position:
+              type: number
+    required:
+      - name
+      - id
+      - transitionDuration
+      - pauseDuration
+      - targetPositions
+  Motion:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        postures:
+          type: array
+          items:
+            $ref: '#/schemas/Posture'
+        loop:
+          type: boolean
+        speedMultiplier:
+          type: number
+      required:
+        - name
+        - id
+        - postures
+        - loop
+        - speedMultiplier

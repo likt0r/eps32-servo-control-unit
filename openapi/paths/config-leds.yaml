@@ -1,0 +1,31 @@
+
+get:
+  summary: List all Leds
+  operationId: getLeds
+  responses:
+    '200':
+      description: A list of Leds
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components.yaml#/schemas/Led'
+post:
+  summary: Update Led list
+  operationId: setLeds
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '../components.yaml#/schemas/Led'
+  responses:
+    '204':
+      description: The created Led
+      content:
+        application/json:
+          schema:
+            $ref: '../components.yaml#/schemas/Led'
