@@ -230,6 +230,66 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
+         * @summary List all Leds
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLeds: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/config/leds`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary List all servos
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getServos: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/config/servos`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get status object off all ESP32 outputs
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -265,7 +325,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getWifiCredentials: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/wifi/credentials`;
+            const localVarPath = `/api/config/wifi/credentials`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -282,6 +342,114 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update Led list
+         * @param {Array<Led>} led 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setLeds: async (led: Array<Led>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'led' is not null or undefined
+            assertParamExists('setLeds', 'led', led)
+            const localVarPath = `/api/config/leds`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(led, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update a servos
+         * @param {Array<Servo>} servo 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setServos: async (servo: Array<Servo>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'servo' is not null or undefined
+            assertParamExists('setServos', 'servo', servo)
+            const localVarPath = `/api/config/servos`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(servo, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update List of WiFi credentials
+         * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setWifiCredentials: async (wifiCredential: Array<WifiCredential>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'wifiCredential' is not null or undefined
+            assertParamExists('setWifiCredentials', 'wifiCredential', wifiCredential)
+            const localVarPath = `/api/config/wifi/credentials`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(wifiCredential, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -432,42 +600,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Update List of WiFi credentials
-         * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateWifiCredentials: async (wifiCredential: Array<WifiCredential>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'wifiCredential' is not null or undefined
-            assertParamExists('updateWifiCredentials', 'wifiCredential', wifiCredential)
-            const localVarPath = `/api/wifi/credentials`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(wifiCredential, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -478,6 +610,26 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
+        /**
+         * 
+         * @summary List all Leds
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLeds(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Led>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLeds(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary List all servos
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getServos(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Servo>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getServos(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
         /**
          * 
          * @summary Get status object off all ESP32 outputs
@@ -496,6 +648,39 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async getWifiCredentials(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WifiCredential>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getWifiCredentials(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update Led list
+         * @param {Array<Led>} led 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setLeds(led: Array<Led>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Led>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setLeds(led, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update a servos
+         * @param {Array<Servo>} servo 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setServos(servo: Array<Servo>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Servo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setServos(servo, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update List of WiFi credentials
+         * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setWifiCredentials(wifiCredential: Array<WifiCredential>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setWifiCredentials(wifiCredential, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -542,17 +727,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateServoPosition_1(motionMode, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
-        /**
-         * 
-         * @summary Update List of WiFi credentials
-         * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateWifiCredentials(wifiCredential: Array<WifiCredential>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateWifiCredentials(wifiCredential, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
     }
 };
 
@@ -563,6 +737,24 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
     return {
+        /**
+         * 
+         * @summary List all Leds
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLeds(options?: any): AxiosPromise<Array<Led>> {
+            return localVarFp.getLeds(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List all servos
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getServos(options?: any): AxiosPromise<Array<Servo>> {
+            return localVarFp.getServos(options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary Get status object off all ESP32 outputs
@@ -580,6 +772,36 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getWifiCredentials(options?: any): AxiosPromise<Array<WifiCredential>> {
             return localVarFp.getWifiCredentials(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update Led list
+         * @param {Array<Led>} led 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setLeds(led: Array<Led>, options?: any): AxiosPromise<Led> {
+            return localVarFp.setLeds(led, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update a servos
+         * @param {Array<Servo>} servo 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setServos(servo: Array<Servo>, options?: any): AxiosPromise<Servo> {
+            return localVarFp.setServos(servo, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update List of WiFi credentials
+         * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setWifiCredentials(wifiCredential: Array<WifiCredential>, options?: any): AxiosPromise<void> {
+            return localVarFp.setWifiCredentials(wifiCredential, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -621,16 +843,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         updateServoPosition_1(motionMode: MotionMode, options?: any): AxiosPromise<void> {
             return localVarFp.updateServoPosition_1(motionMode, options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @summary Update List of WiFi credentials
-         * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateWifiCredentials(wifiCredential: Array<WifiCredential>, options?: any): AxiosPromise<void> {
-            return localVarFp.updateWifiCredentials(wifiCredential, options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -641,6 +853,28 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary List all Leds
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getLeds(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getLeds(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List all servos
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getServos(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getServos(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Get status object off all ESP32 outputs
@@ -661,6 +895,42 @@ export class DefaultApi extends BaseAPI {
      */
     public getWifiCredentials(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getWifiCredentials(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update Led list
+     * @param {Array<Led>} led 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setLeds(led: Array<Led>, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setLeds(led, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update a servos
+     * @param {Array<Servo>} servo 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setServos(servo: Array<Servo>, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setServos(servo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update List of WiFi credentials
+     * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setWifiCredentials(wifiCredential: Array<WifiCredential>, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setWifiCredentials(wifiCredential, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -709,18 +979,6 @@ export class DefaultApi extends BaseAPI {
      */
     public updateServoPosition_1(motionMode: MotionMode, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updateServoPosition_1(motionMode, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Update List of WiFi credentials
-     * @param {Array<WifiCredential>} wifiCredential List of WiFi credentials to be stored
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public updateWifiCredentials(wifiCredential: Array<WifiCredential>, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateWifiCredentials(wifiCredential, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -45,7 +45,7 @@ async function onChange(
 }
 async function onSave() {
    loadingCredentials.value = true;
-   await apiService.updateWifiCredentials(credentials.value);
+   await apiService.setWifiCredentials(credentials.value);
    loadingCredentials.value = false;
    credentialsChanged.value = false;
 }
@@ -95,7 +95,12 @@ onMounted(async () => {
                            :list="credentials"
                            v-bind="dragOptions"
                            @start="drag = true"
-                           @end="drag = false"
+                           @end="
+                              {
+                                 drag = false;
+                                 credentialsChanged = true;
+                              }
+                           "
                         >
                            <template #item="{ element: cred, index }">
                               <v-list-item

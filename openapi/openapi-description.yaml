@@ -28,11 +28,11 @@ paths:
     $ref: 'paths/motion-position.yaml'  
   /api/motion/mode:
     $ref: 'paths/motion-mode.yaml'
-  /api/motion/:
-    $ref: 'paths/motion.yaml'  
-  /api/motion/{motionId}:
-    $ref: 'paths/motion-[id].yaml'  
-  /api/motion/{motionId}/posture':
-    $ref: 'paths/motion-[id]-posture.yaml'
-  /api/motion/{motionId}/posture/{postureId}':
-    $ref: 'paths/motion-[id]-posture-[id].yaml'  
+  # /api/motion/:
+  #   $ref: 'paths/motion.yaml'  
+  # /api/motion/{motionId}:
+  #   $ref: 'paths/motion-[id].yaml'  
+  # # /api/motion/{motionId}/posture':
+  # #   $ref: 'paths/motion-[id]-posture.yaml'
+  # # /api/motion/{motionId}/posture/{postureId}':
+  # #   $ref: 'paths/motion-[id]-posture-[id].yaml'  

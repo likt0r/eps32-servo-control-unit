@@ -15,6 +15,7 @@
 #include "SPIFFS.h"
 #include "WiFiManager.h"
 #include "api.h"
+#include "api/api-config.h"
 #include "motion/motion.h"
 #include "motion/remote.h"
 #include "outputs.h"
@@ -186,7 +187,8 @@ void setup() {
                 });
    }
 
-   setupApi(&server, &outputs, &remoteControlTarget, &motionMode, &wifiManager);
+   setupApi(&server, &outputs, &remoteControlTarget, &motionMode);
+   setupApiConfig(&server, &outputs, &wifiManager);
 
    server.onNotFound([](AsyncWebServerRequest *request) {
       request->send(404, "text/html", "Not found");
