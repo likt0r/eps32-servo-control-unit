@@ -34,6 +34,10 @@ struct Outputs {
    const bool setServosByJSON(const JsonVariant &json);
    String ledsToJson();
    const bool setLedsByJSON(const JsonVariant &json);
+   const bool loadLeds();
+   const bool storeLeds();
+   const bool storeServos();
+   const bool loadServos();
 };
 
 #endif  // OUTPUTS_H

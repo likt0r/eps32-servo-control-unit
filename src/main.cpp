@@ -62,6 +62,8 @@ Outputs outputs = {leds, servos};
 RemoteControlTarget remoteControlTarget =
     createRemoteControlTarget(outputs.servos, 0.5);  // 0.5 degrees per cycle
 
+// loading data from file system
+outputs.loadLeds();
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
 

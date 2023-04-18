@@ -80,6 +80,11 @@ void setupApiConfig(AsyncWebServer *server_p, Outputs *outputs_p,
              request->send(400);  // Bad request
              return;
           }
+          const bool storeResult = outputs_p->storeServos();
+          if (!storeResult) {
+             request->send(500);  // Internal server error
+             return;
+          }
           request->send(204);  // No content
        }));
    // routes for leds
@@ -101,6 +106,11 @@ void setupApiConfig(AsyncWebServer *server_p, Outputs *outputs_p,
           const bool result = outputs_p->setLedsByJSON(json);
           if (!result) {
              request->send(400);  // Bad request
+             return;
+          }
+          const bool storeResult = outputs_p->storeLeds();
+          if (!storeResult) {
+             request->send(500);  // Internal server error
              return;
           }
           request->send(204);  // No content

@@ -1,4 +1,7 @@
 #include "outputs.h"
+
+#include "SPIFFS.h"
+
 bool pinIsValid(int pin) {
    if (pin < 0 || pin >= NUM_DIGITAL_PINS) {
       return false;  // pin number out of range
@@ -170,5 +173,73 @@ const bool Outputs::setLedsByJSON(const JsonVariant &json) {
       newLeds.push_back({id, isOn, pin});
    }
    leds = std::move(newLeds);
+   return true;
+}
+
+const bool Outputs::loadLeds() {
+   File file = SPIFFS.open("/leds.bin",
+                           FILE_READ);  // open file for reading in binary mode
+   if (!file) {
+      Serial.println("Failed to open file for reading");
+      return false;
+   }
+
+   leds.clear();  // clear the existing LED data
+
+   while (file.available()) {  // loop over file data and read LED data
+      LedState led;
+      file.read((uint8_t *)&led, sizeof(LedState));
+      leds.push_back(led);
+   }
+
+   file.close();  // close the file
+   return true;
+}
+
+const bool Outputs::storeLeds() {
+   File file = SPIFFS.open("/leds.bin",
+                           FILE_WRITE);  // open file for writing in binary mode
+   if (!file) {
+      Serial.println("Failed to open file for writing");
+      return false;
+   }
+
+   for (const auto &led : leds) {  // loop over all LEDs and write data to file
+      file.write((const uint8_t *)&led, sizeof(LedState));
+   }
+   file.close();  // close the file
+   return true;
+}
+
+const bool Outputs::storeServos() {
+   File file = SPIFFS.open("/servos.bin", "w");
+   if (!file) {
+      Serial.println("Failed to open file for writing");
+      return false;
+   }
+
+   for (const auto &servo : servos) {
+      file.write((uint8_t *)&servo, sizeof(ServoState));
+   }
+
+   file.close();
+   return true;
+}
+
+const bool Outputs::loadServos() {
+   File file = SPIFFS.open("/servos.bin", "r");
+   if (!file) {
+      Serial.println("Failed to open file for reading");
+      return false;
+   }
+
+   servos.clear();
+   while (file.available()) {
+      ServoState servo;
+      file.read((uint8_t *)&servo, sizeof(ServoState));
+      servos.push_back(servo);
+   }
+
+   file.close();
    return true;
 }
