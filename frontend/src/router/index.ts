@@ -79,7 +79,7 @@ const routes = [
             // which is lazy-loaded when the route is visited.
             // props: (to: any) => ({ data: to.meta.data }),
             props: (to: any) => ({ data: to.meta.data }),
-            component: () => import("@/views/Settings.vue"),
+            component: () => import("@/views/settings/Index.vue"),
          },
       ],
    },

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps, reactive, toRefs } from "vue";
+import { reactive, toRefs } from "vue";
 import { MotionSequence } from "@/Api";
 const props = defineProps<{
    sequence: MotionSequence;

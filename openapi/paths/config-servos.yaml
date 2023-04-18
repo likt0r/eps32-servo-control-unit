@@ -23,11 +23,10 @@ post:
           items:
             $ref: '../components.yaml#/schemas/Servo'
   responses:
-    '201':
-      description: Created
-      content:
-        application/json:
-          schema:
-            $ref: '../components.yaml#/schemas/Servo'
+    '204':
+      description: Updated servos
+    '400':
+      description: Bad requests
+
 
 

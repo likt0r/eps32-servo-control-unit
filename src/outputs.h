@@ -30,6 +30,10 @@ struct Outputs {
    bool setServoPositionById(int id, float position);
    void print();
    String outputToJson();
+   String servosToJson();
+   const bool setServosByJSON(const JsonVariant &json);
+   String ledsToJson();
+   const bool setLedsByJSON(const JsonVariant &json);
 };
 
 #endif  // OUTPUTS_H

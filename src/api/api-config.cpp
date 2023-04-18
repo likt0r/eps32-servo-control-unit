@@ -9,6 +9,7 @@
 
 void setupApiConfig(AsyncWebServer *server_p, Outputs *outputs_p,
                     WiFiManager *wifiManager_p) {
+   // routes for wifi credentials
    server_p->on("/api/config/wifi/credentials", HTTP_GET,
                 [wifiManager_p](AsyncWebServerRequest *request) {
                    Serial.println("GET /api/wifi-credentials");
@@ -31,7 +32,7 @@ void setupApiConfig(AsyncWebServer *server_p, Outputs *outputs_p,
                    request->send(200, "text/plain", "");
                 });
    server_p->addHandler(new AsyncCallbackJsonWebHandler(
-       "/api/config/wifi/credentials",
+       "/api/config/config/wifi/credentials",
        [wifiManager_p](AsyncWebServerRequest *request, JsonVariant &json) {
           Serial.println("POST /api/wifi/credentials");
           JsonArray const &payload = json.as<JsonArray>();
@@ -56,6 +57,52 @@ void setupApiConfig(AsyncWebServer *server_p, Outputs *outputs_p,
           }
 
           wifiManager_p->setCredentials(&credentials);
+          request->send(204);  // No content
+       }));
+   // routes for servos
+   server_p->on("/api/config/servos", HTTP_GET,
+                [outputs_p](AsyncWebServerRequest *request) {
+                   Serial.println("GET /api/config/servos");
+                   request->send(200, "application/json",
+                                 outputs_p->servosToJson());
+                });
+   server_p->on("/api/config/servos", HTTP_OPTIONS,
+                [](AsyncWebServerRequest *request) {
+                   Serial.println("OPTIONS /api/config/servos");
+                   request->send(200, "text/plain", "");
+                });
+   server_p->addHandler(new AsyncCallbackJsonWebHandler(
+       "/api/config/servos",
+       [outputs_p](AsyncWebServerRequest *request, JsonVariant &json) {
+          Serial.println("POST /api/config/servos");
+          const bool result = outputs_p->setServosByJSON(json);
+          if (!result) {
+             request->send(400);  // Bad request
+             return;
+          }
+          request->send(204);  // No content
+       }));
+   // routes for leds
+   server_p->on("/api/config/leds", HTTP_GET,
+                [outputs_p](AsyncWebServerRequest *request) {
+                   Serial.println("GET /api/config/leds");
+                   request->send(200, "application/json",
+                                 outputs_p->ledsToJson());
+                });
+   server_p->on("/api/config/leds", HTTP_OPTIONS,
+                [](AsyncWebServerRequest *request) {
+                   Serial.println("OPTIONS /api/config/leds");
+                   request->send(200, "text/plain", "");
+                });
+   server_p->addHandler(new AsyncCallbackJsonWebHandler(
+       "/api/config/leds",
+       [outputs_p](AsyncWebServerRequest *request, JsonVariant &json) {
+          Serial.println("POST /api/config/leds");
+          const bool result = outputs_p->setLedsByJSON(json);
+          if (!result) {
+             request->send(400);  // Bad request
+             return;
+          }
           request->send(204);  // No content
        }));
 };

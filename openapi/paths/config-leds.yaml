@@ -24,8 +24,6 @@ post:
             $ref: '../components.yaml#/schemas/Led'
   responses:
     '204':
-      description: The created Led
-      content:
-        application/json:
-          schema:
-            $ref: '../components.yaml#/schemas/Led'
+      description: Updated leds
+    '400':
+      description: Bad requests

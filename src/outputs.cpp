@@ -1,5 +1,17 @@
 #include "outputs.h"
-
+bool pinIsValid(int pin) {
+   if (pin < 0 || pin >= NUM_DIGITAL_PINS) {
+      return false;  // pin number out of range
+   }
+   if (pin == 6 || pin == 7 || pin == 8 || pin == 11 || pin == 12 ||
+       pin == 13 || pin == 14 || pin == 15 || pin == 19 || pin == 20 ||
+       pin == 21 || pin == 22 || pin == 25 || pin == 26 || pin == 27 ||
+       pin == 32 || pin == 33 || pin == 34 || pin == 35 || pin == 36 ||
+       pin == 37 || pin == 38 || pin == 39) {
+      return true;  // valid pin number
+   }
+   return false;  // pin number not valid for ESP32
+}
 // Outputs implementation
 bool Outputs::setLedStatusById(int id, bool isOn) {
    Serial.print("setLedStatusById: ");
@@ -79,4 +91,84 @@ String Outputs::outputToJson() {
    String json;
    serializeJson(doc, json);
    return json;
+}
+String Outputs::servosToJson() {
+   DynamicJsonDocument doc(1024);
+   JsonArray jsonServos = doc.to<JsonArray>();
+   for (const auto &servo : servos) {
+      float position = servo.position;
+      JsonObject jsonServo = jsonServos.createNestedObject();
+      jsonServo["id"] = servo.id;
+      jsonServo["pin"] = servo.pin;
+      jsonServo["position"] = position;
+      jsonServo["minPwm"] = servo.minPwm;
+      jsonServo["maxPwm"] = servo.maxPwm;
+      jsonServo["minAngle"] = servo.minAngle;
+      jsonServo["maxAngle"] = servo.maxAngle;
+   }
+   String json;
+   serializeJson(jsonServos, json);
+   return json;
+}
+
+String Outputs::ledsToJson() {
+   DynamicJsonDocument doc(1024);
+   JsonArray jsonLeds = doc.createNestedArray("leds");
+   for (const auto &led : leds) {
+      bool isOn = led.isOn;
+      JsonObject jsonLed = jsonLeds.createNestedObject();
+      jsonLed["id"] = led.id;
+      jsonLed["isOn"] = isOn;
+      jsonLed["pin"] = led.pin;
+   }
+
+   String json;
+   serializeJson(jsonLeds, json);
+   return json;
+}
+
+const bool Outputs::setServosByJSON(const JsonVariant &json) {
+   JsonArray jsonServos = json.as<JsonArray>();
+
+   // Check all conditions and create temporary ServoState objects
+   std::vector<ServoState> newServos;
+   newServos.reserve(jsonServos.size());
+   for (const auto &jsonServo : jsonServos) {
+      int id = jsonServo["id"];
+      int pin = jsonServo["pin"];
+      float position = jsonServo["position"];
+      int minPwm = jsonServo["minPwm"];
+      int maxPwm = jsonServo["maxPwm"];
+      float minAngle = jsonServo["minAngle"];
+      float maxAngle = jsonServo["maxAngle"];
+      if (minPwm < 0 || maxPwm < 0 || minAngle < 0 || maxAngle < 0 ||
+          maxAngle > 360)
+         return false;
+      if (minPwm >= maxPwm || minAngle >= maxAngle) return false;
+      if (position < minAngle || position > maxAngle) return false;
+      if (!pinIsValid(pin)) return false;  // check if pin is valid
+      newServos.push_back(
+          {id, pin, position, minPwm, maxPwm, minAngle, maxAngle});
+   }
+
+   // Replace existing servos with the new ones
+   servos = std::move(newServos);
+   return true;
+}
+
+const bool Outputs::setLedsByJSON(const JsonVariant &json) {
+   JsonArray jsonLeds = json.as<JsonArray>();
+
+   // Check all conditions and create temporary ServoState objects
+   std::vector<LedState> newLeds;
+   newLeds.reserve(jsonLeds.size());
+   for (const auto &jsonLed : jsonLeds) {
+      int id = jsonLed["id"];
+      bool isOn = jsonLed["isOn"];
+      int pin = jsonLed["pin"];
+      if (!pinIsValid(pin)) return false;  // check if pin is valid
+      newLeds.push_back({id, isOn, pin});
+   }
+   leds = std::move(newLeds);
+   return true;
 }
