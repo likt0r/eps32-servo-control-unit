@@ -8,7 +8,7 @@
 #include "motion/remote.h"
 #include "outputs.h"
 
-void setupApi(AsyncWebServer *server_p, Outputs *outputs_p,
+void setupApi(AsyncWebServer *server_p, PinOutputs *outputs_p,
               RemoteControlTarget *remoteControlTarget_p,
               MotionMode *motionMode) {
    server_p->on(

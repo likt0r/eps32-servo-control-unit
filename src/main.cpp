@@ -57,13 +57,14 @@ std::vector<ServoState> servos = {{0, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
                                    SERVO_MIN_ANGLE, SERVO_MAX_ANGLE}};
 
 // SemaphoreHandle_t outputsSemaphore;
-Outputs outputs = {leds, servos};
+PinOutputs outputs = {leds, servos};
+
 // initialise the remote control target from the outputs
 RemoteControlTarget remoteControlTarget =
     createRemoteControlTarget(outputs.servos, 0.5);  // 0.5 degrees per cycle
 
 // loading data from file system
-outputs.loadLeds();
+
 // Creating a AsyncWebServer object
 AsyncWebServer server(80);
 
@@ -126,7 +127,21 @@ void motorLoopISR() {
 
 void setup() {
    // Serial port for debugging purposes
+
    Serial.begin(115200);
+   Serial.println("Starting up");
+   // Initialize SPIFFS
+   Serial.println("Mounting SPIFFS ...");
+   if (!SPIFFS.begin()) {
+      Serial.println("An Error has occurred while mounting SPIFFS");
+      return;
+   }
+   Serial.println("Loading configuration from file system ...");
+   Serial.println("Loading Servos Configuration...");
+   outputs.loadServos();
+   Serial.println("Loading Leds Configuration...");
+   outputs.loadLeds();
+   Serial.println("Done loading configuration from file system");
 
    // intialize semaphores
    //  Initialize the semaphore with a count of 1
@@ -158,12 +173,6 @@ void setup() {
 
    Serial.print("IP-Address ");
    Serial.println(wifiManager.getLocalIP());
-
-   // Initialize SPIFFS
-   if (!SPIFFS.begin()) {
-      Serial.println("An Error has occurred while mounting SPIFFS");
-      return;
-   }
 
    // Set the server to run on the secondary core
    // Set the server to run on the secondary core

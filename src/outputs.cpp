@@ -15,8 +15,8 @@ bool pinIsValid(int pin) {
    }
    return false;  // pin number not valid for ESP32
 }
-// Outputs implementation
-bool Outputs::setLedStatusById(int id, bool isOn) {
+// PinOutputs implementation
+bool PinOutputs::setLedStatusById(int id, bool isOn) {
    Serial.print("setLedStatusById: ");
    Serial.print(id);
    Serial.print(" ");
@@ -31,7 +31,7 @@ bool Outputs::setLedStatusById(int id, bool isOn) {
    return false;
 };
 
-bool Outputs::setServoPositionById(int id, float position) {
+bool PinOutputs::setServoPositionById(int id, float position) {
    for (auto &servo : servos) {
       if (servo.id == id) {
          servo.position = position;
@@ -41,7 +41,7 @@ bool Outputs::setServoPositionById(int id, float position) {
    return false;
 };
 
-int Outputs::getLedPin(int id) {
+int PinOutputs::getLedPin(int id) {
    for (auto &led : leds) {
       if (led.id == id) {
          return led.pin;
@@ -49,7 +49,7 @@ int Outputs::getLedPin(int id) {
    }
    return -1;
 };
-void Outputs::print() {
+void PinOutputs::print() {
    Serial.println("Leds: ");
    for (auto &led : leds) {
       Serial.print("\t id: ");
@@ -68,7 +68,7 @@ void Outputs::print() {
    }
 }
 
-String Outputs::outputToJson() {
+String PinOutputs::outputToJson() {
    DynamicJsonDocument doc(1024);
    JsonArray jsonLeds = doc.createNestedArray("leds");
    for (const auto &led : leds) {
@@ -95,7 +95,7 @@ String Outputs::outputToJson() {
    serializeJson(doc, json);
    return json;
 }
-String Outputs::servosToJson() {
+String PinOutputs::servosToJson() {
    DynamicJsonDocument doc(1024);
    JsonArray jsonServos = doc.to<JsonArray>();
    for (const auto &servo : servos) {
@@ -114,7 +114,7 @@ String Outputs::servosToJson() {
    return json;
 }
 
-String Outputs::ledsToJson() {
+String PinOutputs::ledsToJson() {
    DynamicJsonDocument doc(1024);
    JsonArray jsonLeds = doc.createNestedArray("leds");
    for (const auto &led : leds) {
@@ -130,7 +130,7 @@ String Outputs::ledsToJson() {
    return json;
 }
 
-const bool Outputs::setServosByJSON(const JsonVariant &json) {
+const bool PinOutputs::setServosByJSON(const JsonVariant &json) {
    JsonArray jsonServos = json.as<JsonArray>();
 
    // Check all conditions and create temporary ServoState objects
@@ -159,7 +159,7 @@ const bool Outputs::setServosByJSON(const JsonVariant &json) {
    return true;
 }
 
-const bool Outputs::setLedsByJSON(const JsonVariant &json) {
+const bool PinOutputs::setLedsByJSON(const JsonVariant &json) {
    JsonArray jsonLeds = json.as<JsonArray>();
 
    // Check all conditions and create temporary ServoState objects
@@ -176,7 +176,7 @@ const bool Outputs::setLedsByJSON(const JsonVariant &json) {
    return true;
 }
 
-const bool Outputs::loadLeds() {
+const bool PinOutputs::loadLeds() {
    File file = SPIFFS.open("/leds.bin",
                            FILE_READ);  // open file for reading in binary mode
    if (!file) {
@@ -196,7 +196,7 @@ const bool Outputs::loadLeds() {
    return true;
 }
 
-const bool Outputs::storeLeds() {
+const bool PinOutputs::storeLeds() {
    File file = SPIFFS.open("/leds.bin",
                            FILE_WRITE);  // open file for writing in binary mode
    if (!file) {
@@ -211,7 +211,7 @@ const bool Outputs::storeLeds() {
    return true;
 }
 
-const bool Outputs::storeServos() {
+const bool PinOutputs::storeServos() {
    File file = SPIFFS.open("/servos.bin", "w");
    if (!file) {
       Serial.println("Failed to open file for writing");
@@ -226,7 +226,7 @@ const bool Outputs::storeServos() {
    return true;
 }
 
-const bool Outputs::loadServos() {
+const bool PinOutputs::loadServos() {
    File file = SPIFFS.open("/servos.bin", "r");
    if (!file) {
       Serial.println("Failed to open file for reading");

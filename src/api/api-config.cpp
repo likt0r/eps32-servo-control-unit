@@ -7,7 +7,7 @@
 #include "motion/remote.h"
 #include "outputs.h"
 
-void setupApiConfig(AsyncWebServer *server_p, Outputs *outputs_p,
+void setupApiConfig(AsyncWebServer *server_p, PinOutputs *outputs_p,
                     WiFiManager *wifiManager_p) {
    // routes for wifi credentials
    server_p->on("/api/config/wifi/credentials", HTTP_GET,

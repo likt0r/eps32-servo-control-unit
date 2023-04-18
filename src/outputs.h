@@ -22,7 +22,7 @@ struct ServoState {
    float maxAngle;
 };
 
-struct Outputs {
+struct PinOutputs {
    std::vector<LedState> leds;
    std::vector<ServoState> servos;
    bool setLedStatusById(int id, bool isOn);
