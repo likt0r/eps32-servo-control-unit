@@ -15,3 +15,10 @@ export function fromEnum<EnumType>(
       t.identity
    );
 }
+
+
+export const PWM_PINS = Array.from({ length: 32 }, (_, index) => index);
+// .map(value => ({
+//    value: value,
+//    label: `GPIO${value}`
+// }))

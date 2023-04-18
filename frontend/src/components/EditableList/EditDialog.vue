@@ -20,7 +20,7 @@
             <v-card-actions>
                <v-spacer></v-spacer>
                <v-btn @click="dialog = false"> Cancel </v-btn>
-               <v-btn color="primary" type="submit"> Save </v-btn>
+               <v-btn color="primary" type="submit"> Ok </v-btn>
             </v-card-actions>
          </v-form>
       </v-card>

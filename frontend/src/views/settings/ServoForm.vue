@@ -1,27 +1,55 @@
 <template>
    <v-row>
       <v-col
-         ><v-text-field v-model="value.id" label="id" type="number"
+         ><v-text-field
+            v-model="value.id"
+            label="id"
+            type="number"
+            :rules="[isRequired('id'), isGreaterEqualValue('id', 0)]"
       /></v-col>
       <v-col><v-text-field type="text" label="Servo Name" /></v-col>
    </v-row>
    <v-row>
-      <v-col
-         ><v-text-field v-model="value.pin" type="number" label="Pin"
+      <v-col>
+         <v-select
+            v-model="value.pin"
+            label="Select a pin"
+            :items="PWM_PINS"
+            item-props="value"
+            item-title="label"
+            return-object
       /></v-col>
       <v-col
          ><v-text-field
             v-model="value.position"
             label="Start Position in°"
+            :rules="[
+               isRequired('Start Position'),
+               isGreaterEqualValue('Start Position', 0),
+               isSmallerEqualValue('Start Position', 360),
+            ]"
             type="number"
       /></v-col>
    </v-row>
    <v-row>
       <v-col
-         ><v-text-field v-model="value.minPwm" type="number" label="Min PWM"
+         ><v-text-field
+            v-model="value.minPwm"
+            type="number"
+            label="Min PWM"
+            :rules="[
+               isRequired('Min PWM'),
+               isGreaterEqualValue('Min PWM', 0),
+               isSmallerEqualValue('Min PWM', value.maxPwm),
+            ]"
       /></v-col>
       <v-col
-         ><v-text-field v-model="value.maxPwm" type="number" label="Max PWM" />
+         ><v-text-field
+            v-model="value.maxPwm"
+            type="number"
+            label="Max PWM"
+            :rules="[isRequired('Max PWM'), isGreaterEqualValue('Max PWM', 0)]"
+         />
       </v-col>
    </v-row>
    <v-row>
@@ -38,7 +66,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Servo } from "@/ApiService";
-
+import {
+   isRequired,
+   isGreaterEqualValue,
+   isGreaterOtherFieldValue,
+   isSmallerEqualValue,
+} from "@/form";
+import { PWM_PINS } from "@/tools";
 export interface Props {
    modelValue: Servo;
 }

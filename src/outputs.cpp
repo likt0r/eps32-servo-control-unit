@@ -6,11 +6,7 @@ bool pinIsValid(int pin) {
    if (pin < 0 || pin >= NUM_DIGITAL_PINS) {
       return false;  // pin number out of range
    }
-   if (pin == 6 || pin == 7 || pin == 8 || pin == 11 || pin == 12 ||
-       pin == 13 || pin == 14 || pin == 15 || pin == 19 || pin == 20 ||
-       pin == 21 || pin == 22 || pin == 25 || pin == 26 || pin == 27 ||
-       pin == 32 || pin == 33 || pin == 34 || pin == 35 || pin == 36 ||
-       pin == 37 || pin == 38 || pin == 39) {
+   if (pin <= 32) {
       return true;  // valid pin number
    }
    return false;  // pin number not valid for ESP32
@@ -169,7 +165,11 @@ const bool PinOutputs::setLedsByJSON(const JsonVariant &json) {
       int id = jsonLed["id"];
       bool isOn = jsonLed["isOn"];
       int pin = jsonLed["pin"];
-      if (!pinIsValid(pin)) return false;  // check if pin is valid
+      Serial.print("Leds id: ");
+      Serial.println(pin);
+      if (!pinIsValid(pin)) {
+         return false;
+      }  // check if pin is valid
       newLeds.push_back({id, isOn, pin});
    }
    leds = std::move(newLeds);

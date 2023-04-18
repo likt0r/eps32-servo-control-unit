@@ -105,11 +105,13 @@ void setupApiConfig(AsyncWebServer *server_p, PinOutputs *outputs_p,
           Serial.println("POST /api/config/leds");
           const bool result = outputs_p->setLedsByJSON(json);
           if (!result) {
+             Serial.println("Bad request");
              request->send(400);  // Bad request
              return;
           }
           const bool storeResult = outputs_p->storeLeds();
           if (!storeResult) {
+             Serial.println("Server error result from request");
              request->send(500);  // Internal server error
              return;
           }
