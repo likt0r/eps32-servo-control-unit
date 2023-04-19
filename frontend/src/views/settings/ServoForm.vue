@@ -66,12 +66,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Servo } from "@/ApiService";
-import {
-   isRequired,
-   isGreaterEqualValue,
-   isGreaterOtherFieldValue,
-   isSmallerEqualValue,
-} from "@/form";
+import { isRequired, isGreaterEqualValue, isSmallerEqualValue } from "@/form";
 import { PWM_PINS } from "@/tools";
 export interface Props {
    modelValue: Servo;

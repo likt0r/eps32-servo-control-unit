@@ -260,6 +260,66 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get motion mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMotionMode: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/remote/mode`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get motion speed
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMotionSpeed: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/remote/speed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary List all servos
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -386,6 +446,114 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Set target servo position
+         * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setMotionMode: async (motionMode: MotionMode, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'motionMode' is not null or undefined
+            assertParamExists('setMotionMode', 'motionMode', motionMode)
+            const localVarPath = `/api/remote/mode`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(motionMode, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Set Motion speed
+         * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setMotionSpeed: async (motionSpeed: MotionSpeed, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'motionSpeed' is not null or undefined
+            assertParamExists('setMotionSpeed', 'motionSpeed', motionSpeed)
+            const localVarPath = `/api/remote/speed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(motionSpeed, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Set target servo position
+         * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setServoPosition: async (servoPosition: ServoPosition, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'servoPosition' is not null or undefined
+            assertParamExists('setServoPosition', 'servoPosition', servoPosition)
+            const localVarPath = `/api/remote/position`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(servoPosition, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Update a servos
          * @param {Array<Servo>} servo 
          * @param {*} [options] Override http request option.
@@ -492,114 +660,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Set Motion speed
-         * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateMotionSpeed: async (motionSpeed: MotionSpeed, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'motionSpeed' is not null or undefined
-            assertParamExists('updateMotionSpeed', 'motionSpeed', motionSpeed)
-            const localVarPath = `/api/motion/speed`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(motionSpeed, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Set target servo position
-         * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateServoPosition: async (servoPosition: ServoPosition, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'servoPosition' is not null or undefined
-            assertParamExists('updateServoPosition', 'servoPosition', servoPosition)
-            const localVarPath = `/api/motion/position`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(servoPosition, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Set target servo position
-         * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateServoPosition_1: async (motionMode: MotionMode, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'motionMode' is not null or undefined
-            assertParamExists('updateServoPosition_1', 'motionMode', motionMode)
-            const localVarPath = `/api/motion/mode`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(motionMode, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -618,6 +678,26 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async getLeds(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Led>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getLeds(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get motion mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMotionMode(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMotionMode(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get motion speed
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMotionSpeed(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMotionSpeed(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -657,8 +737,41 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setLeds(led: Array<Led>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Led>> {
+        async setLeds(led: Array<Led>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.setLeds(led, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Set target servo position
+         * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setMotionMode(motionMode: MotionMode, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setMotionMode(motionMode, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Set Motion speed
+         * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setMotionSpeed(motionSpeed: MotionSpeed, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setMotionSpeed(motionSpeed, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Set target servo position
+         * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setServoPosition(servoPosition: ServoPosition, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setServoPosition(servoPosition, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -668,7 +781,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setServos(servo: Array<Servo>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Servo>> {
+        async setServos(servo: Array<Servo>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.setServos(servo, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -694,39 +807,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateLedStatus(ledStatus, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
-        /**
-         * 
-         * @summary Set Motion speed
-         * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateMotionSpeed(motionSpeed: MotionSpeed, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateMotionSpeed(motionSpeed, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Set target servo position
-         * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateServoPosition(servoPosition: ServoPosition, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateServoPosition(servoPosition, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Set target servo position
-         * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateServoPosition_1(motionMode: MotionMode, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateServoPosition_1(motionMode, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
     }
 };
 
@@ -745,6 +825,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getLeds(options?: any): AxiosPromise<Array<Led>> {
             return localVarFp.getLeds(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get motion mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMotionMode(options?: any): AxiosPromise<string> {
+            return localVarFp.getMotionMode(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get motion speed
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMotionSpeed(options?: any): AxiosPromise<string> {
+            return localVarFp.getMotionSpeed(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -780,8 +878,38 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setLeds(led: Array<Led>, options?: any): AxiosPromise<Led> {
+        setLeds(led: Array<Led>, options?: any): AxiosPromise<void> {
             return localVarFp.setLeds(led, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set target servo position
+         * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setMotionMode(motionMode: MotionMode, options?: any): AxiosPromise<void> {
+            return localVarFp.setMotionMode(motionMode, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set Motion speed
+         * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setMotionSpeed(motionSpeed: MotionSpeed, options?: any): AxiosPromise<void> {
+            return localVarFp.setMotionSpeed(motionSpeed, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set target servo position
+         * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setServoPosition(servoPosition: ServoPosition, options?: any): AxiosPromise<void> {
+            return localVarFp.setServoPosition(servoPosition, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -790,7 +918,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setServos(servo: Array<Servo>, options?: any): AxiosPromise<Servo> {
+        setServos(servo: Array<Servo>, options?: any): AxiosPromise<void> {
             return localVarFp.setServos(servo, options).then((request) => request(axios, basePath));
         },
         /**
@@ -813,36 +941,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         updateLedStatus(ledStatus: LedStatus, options?: any): AxiosPromise<void> {
             return localVarFp.updateLedStatus(ledStatus, options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @summary Set Motion speed
-         * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateMotionSpeed(motionSpeed: MotionSpeed, options?: any): AxiosPromise<void> {
-            return localVarFp.updateMotionSpeed(motionSpeed, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Set target servo position
-         * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateServoPosition(servoPosition: ServoPosition, options?: any): AxiosPromise<void> {
-            return localVarFp.updateServoPosition(servoPosition, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Set target servo position
-         * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateServoPosition_1(motionMode: MotionMode, options?: any): AxiosPromise<void> {
-            return localVarFp.updateServoPosition_1(motionMode, options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -862,6 +960,28 @@ export class DefaultApi extends BaseAPI {
      */
     public getLeds(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getLeds(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get motion mode
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getMotionMode(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getMotionMode(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get motion speed
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getMotionSpeed(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getMotionSpeed(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -911,6 +1031,42 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
+     * @summary Set target servo position
+     * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setMotionMode(motionMode: MotionMode, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setMotionMode(motionMode, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Set Motion speed
+     * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setMotionSpeed(motionSpeed: MotionSpeed, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setMotionSpeed(motionSpeed, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Set target servo position
+     * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public setServoPosition(servoPosition: ServoPosition, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).setServoPosition(servoPosition, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Update a servos
      * @param {Array<Servo>} servo 
      * @param {*} [options] Override http request option.
@@ -943,42 +1099,6 @@ export class DefaultApi extends BaseAPI {
      */
     public updateLedStatus(ledStatus: LedStatus, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updateLedStatus(ledStatus, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Set Motion speed
-     * @param {MotionSpeed} motionSpeed Set target motion speed of all servos, will work only in remote_control mode
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public updateMotionSpeed(motionSpeed: MotionSpeed, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateMotionSpeed(motionSpeed, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Set target servo position
-     * @param {ServoPosition} servoPosition Set target position of a servo will work only in remote_control mode
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public updateServoPosition(servoPosition: ServoPosition, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateServoPosition(servoPosition, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Set target servo position
-     * @param {MotionMode} motionMode Set target position of a servo will work only in remote_control mode
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public updateServoPosition_1(motionMode: MotionMode, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateServoPosition_1(motionMode, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

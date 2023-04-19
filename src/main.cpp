@@ -16,6 +16,7 @@
 #include "WiFiManager.h"
 #include "api.h"
 #include "api/api-config.h"
+#include "api/api-remote.h"
 #include "motion/motion.h"
 #include "motion/remote.h"
 #include "outputs.h"
@@ -60,8 +61,7 @@ std::vector<ServoState> servos = {{0, 32, 0.0, SERVO_PWM_MIN, SERVO_PWM_MAX,
 PinOutputs outputs = {leds, servos};
 
 // initialise the remote control target from the outputs
-RemoteControlTarget remoteControlTarget =
-    createRemoteControlTarget(outputs.servos, 0.5);  // 0.5 degrees per cycle
+RemoteControlTarget remoteControlTarget;
 
 // loading data from file system
 
@@ -118,6 +118,7 @@ void motorLoopISR() {
 
    for (auto &servo : outputs.servos) {
       int position = servo.position;
+
       int pwm = map(round(position), servo.minAngle, servo.maxAngle,
                     servo.minPwm, servo.maxPwm);
       ledcWrite(servo.id, pwm);
@@ -139,10 +140,12 @@ void setup() {
    Serial.println("Loading configuration from file system ...");
    Serial.println("Loading Servos Configuration...");
    outputs.loadServos();
-   Serial.println("Loading Leds Configuration...");
+   Serial.println("Loading Leds1 Configuration...");
    outputs.loadLeds();
    Serial.println("Done loading configuration from file system");
-
+   Serial.println("Create Remote Control Target");
+   remoteControlTarget =
+       createRemoteControlTarget(outputs.servos, 0.5);  // 0.5 degrees per cycle
    // intialize semaphores
    //  Initialize the semaphore with a count of 1
    // outputsSemaphore = xSemaphoreCreateBinary();
@@ -198,8 +201,9 @@ void setup() {
                 });
    }
 
-   setupApi(&server, &outputs, &remoteControlTarget, &motionMode);
+   setupApi(&server, &outputs);
    setupApiConfig(&server, &outputs, &wifiManager);
+   setupApiRemote(&server, &remoteControlTarget, &motionMode);
 
    server.onNotFound([](AsyncWebServerRequest *request) {
       request->send(404, "text/html", "Not found");

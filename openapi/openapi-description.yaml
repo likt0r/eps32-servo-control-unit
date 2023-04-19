@@ -22,12 +22,12 @@ paths:
     $ref: 'paths/led.yaml'
   /api/status:
     $ref: 'paths/status.yaml'
-  /api/motion/speed:
-    $ref: 'paths/motion-speed.yaml'  
-  /api/motion/position:
-    $ref: 'paths/motion-position.yaml'  
-  /api/motion/mode:
-    $ref: 'paths/motion-mode.yaml'
+  /api/remote/speed:
+    $ref: 'paths/remote-speed.yaml'  
+  /api/remote/position:
+    $ref: 'paths/remote-position.yaml'  
+  /api/remote/mode:
+    $ref: 'paths/remote-mode.yaml'
   # /api/motion/:
   #   $ref: 'paths/motion.yaml'  
   # /api/motion/{motionId}:

@@ -31,12 +31,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { Led } from "@/ApiService";
-import {
-   isRequired,
-   isGreaterEqualValue,
-   isGreaterOtherFieldValue,
-   isSmallerEqualValue,
-} from "@/form";
+import { isRequired, isGreaterEqualValue } from "@/form";
 
 import { PWM_PINS } from "@/tools";
 export interface Props {

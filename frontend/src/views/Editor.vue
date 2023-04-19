@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import throttle from "lodash/throttle";
 import { mdiAngleAcute, mdiSpeedometer } from "@mdi/js";
 import ViewWrapper from "@/components/ViewWrapper.vue";
 import apiService from "@/ApiService";
-import { Servo, MotionModeModeEnum } from "@/ApiService";
+import { Servo, MotionModeModeEnum, MotionMode } from "@/ApiService";
 
 import useAppStore from "@/store/app";
 const { publishAlert } = useAppStore();
-
+const loadingServos = ref(false);
+const loadingLeds = ref(false);
 const servos = ref<Servo[]>([]);
 const motionSpeed = ref<number>(0.1);
 const motionMode = ref<MotionModeModeEnum>(MotionModeModeEnum.Idle);
@@ -25,9 +26,25 @@ const motionMode = ref<MotionModeModeEnum>(MotionModeModeEnum.Idle);
 //    };
 // }
 
+onMounted(async () => {
+   loadingServos.value = true;
+   try {
+      loadingServos.value = true;
+      const servoResponse = await apiService.getServos();
+      servos.value = servoResponse.data;
+      const modeResponse = await apiService.setMotionMode({
+         mode: MotionModeModeEnum.RemoteControl,
+      });
+   } catch (error: any) {
+      console.log("error", error);
+      publishAlert("error", "Could not load Servos", JSON.stringify(error));
+   }
+   loadingServos.value = false;
+});
+
 const onPositionUpdate = throttle(async (id: number, position: number) => {
    try {
-      await apiService.updateServoPosition({
+      await apiService.setServoPosition({
          id,
          position,
       });
@@ -43,7 +60,7 @@ const onPositionUpdate = throttle(async (id: number, position: number) => {
 
 const onMotionSpeedUpdate = throttle(async (speed: number) => {
    try {
-      await apiService.updateMotionSpeed({ speed });
+      await apiService.setMotionSpeed({ speed });
    } catch (error) {
       console.log("error", error);
       publishAlert(
@@ -61,6 +78,7 @@ const onMotionSpeedUpdate = throttle(async (speed: number) => {
          <v-card-text>
             <v-container fluid>
                <!-- <MotionSequenceComponent :sequence="currentMotionSequence" /> -->
+
                <v-row>
                   <v-col cols="12" sm="10" md="10">
                      <div class="text-caption">
