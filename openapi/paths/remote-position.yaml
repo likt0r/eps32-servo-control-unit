@@ -1,0 +1,20 @@
+post:
+  summary: Set target servo position
+  operationId: setServoPosition
+  requestBody:
+    description: Set target position of a servo will work only in remote_control mode
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: '../components.yaml#/schemas/ServoPosition'
+  responses:
+    '204':
+      description:  Target Position updated successfully
+    '400':
+      description: Bad Request, f.e. missing position field
+      content:
+        application/json:
+          schema:
+              $ref: '../components.yaml#/schemas/Error'

@@ -2,8 +2,8 @@
 
 #include <string>
 
+#include "../WiFiManager.h"
 #include "api.h"
-#include "motion/motion.h"
 #include "motion/remote.h"
 #include "outputs.h"
 

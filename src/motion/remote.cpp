@@ -4,8 +4,8 @@
 
 bool RemoteControlTarget::setServoPositionById(int id, float position) {
    for (auto& servo : positions) {
-      if (servo.id == id) {
-         servo.position = position;
+      if (servo.getId() == id) {
+         servo.setPosition(position);
          return true;
       }
    }
@@ -18,10 +18,7 @@ RemoteControlTarget createRemoteControlTarget(
    target.speed = speed;
 
    for (const auto& servo : servos) {
-      TargetPosition position;
-      position.id = servo.id;
-      position.position = servo.position;
-      target.positions.push_back(position);
+      target.positions.emplace_back(servo.id, servo.position);
    }
 
    return target;

@@ -2,14 +2,11 @@
 #define REMOTE_H
 #include <vector>
 
+#include "TargetPosition.h"
 #include "outputs.h"
-struct TargetPosition {
-   int id;
-   volatile float position;
-};
 
 struct RemoteControlTarget {
-   volatile float speed;
+   float speed;
    std::vector<TargetPosition> positions;
    bool setServoPositionById(int id, float position);
 };

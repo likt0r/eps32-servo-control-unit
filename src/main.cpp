@@ -16,8 +16,10 @@
 #include "WiFiManager.h"
 #include "api.h"
 #include "api/api-config.h"
+#include "api/api-motion.h"
 #include "api/api-remote.h"
-#include "motion/motion.h"
+#include "motion/MotionManager.h"
+#include "motion/player.h"
 #include "motion/remote.h"
 #include "outputs.h"
 
@@ -77,6 +79,7 @@ String outputState(int output) {
 }
 
 /** Motion State Variables **/
+MotionManager motionManager = MotionManager();
 MotionMode motionMode = STARTUP;
 int startupCounter = 0;
 /** Hardware timer for 100 Hz servo update frequency*/
@@ -98,13 +101,13 @@ void motorLoopISR() {
       case REMOTE_CONTROL:
          float speed = remoteControlTarget.speed;
          for (const auto &pos : remoteControlTarget.positions) {
-            int id = pos.id;
+            int id = pos.getId();
             auto servo =
                 std::find_if(outputs.servos.begin(), outputs.servos.end(),
                              [&](const ServoState &s) { return s.id == id; });
             if (servo != outputs.servos.end()) {
                float currentPos = servo->position;
-               float targetPos = pos.position;
+               float targetPos = pos.getPosition();
                float gradient = targetPos - currentPos;
                gradient = std::max(-speed, std::min(speed, gradient));  // limit
                currentPos += gradient;
@@ -142,6 +145,8 @@ void setup() {
    outputs.loadServos();
    Serial.println("Loading Leds1 Configuration...");
    outputs.loadLeds();
+   Serial.println("Loading Motions...");
+   motionManager.loadMotions();
    Serial.println("Done loading configuration from file system");
    Serial.println("Create Remote Control Target");
    remoteControlTarget =
@@ -204,7 +209,7 @@ void setup() {
    setupApi(&server, &outputs);
    setupApiConfig(&server, &outputs, &wifiManager);
    setupApiRemote(&server, &remoteControlTarget, &motionMode);
-
+   setupApiMotion(&server, &motionManager);
    server.onNotFound([](AsyncWebServerRequest *request) {
       request->send(404, "text/html", "Not found");
    });

@@ -1,0 +1,31 @@
+get:
+  summary: Get motion mode
+  operationId: getMotionMode
+  responses:
+    '200':
+      description: Get current motion mode
+      content:
+        text/plain:
+          schema:
+            type: string
+
+post:
+  summary: Set target servo position
+  operationId: setMotionMode
+  requestBody:
+    description: Set target position of a servo will work only in remote_control mode
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          $ref: '../components.yaml#/schemas/MotionMode'
+  responses:
+    '204':
+      description: Motion mode changed successfully
+    '400':
+      description: Bad Request, f.e. missing mode field
+      content:
+        application/json:
+          schema:
+              $ref: '../components.yaml#/schemas/Error'

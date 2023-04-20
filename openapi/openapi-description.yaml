@@ -28,10 +28,10 @@ paths:
     $ref: 'paths/remote-position.yaml'  
   /api/remote/mode:
     $ref: 'paths/remote-mode.yaml'
-  # /api/motion/:
-  #   $ref: 'paths/motion.yaml'  
-  # /api/motion/{motionId}:
-  #   $ref: 'paths/motion-[id].yaml'  
+  /api/motion/:
+    $ref: 'paths/motion.yaml'  
+  /api/motion/{motionId}:
+    $ref: 'paths/motion-[id].yaml'  
   # # /api/motion/{motionId}/posture':
   # #   $ref: 'paths/motion-[id]-posture.yaml'
   # # /api/motion/{motionId}/posture/{postureId}':

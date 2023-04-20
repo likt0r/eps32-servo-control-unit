@@ -26,45 +26,4 @@ post:
           schema:
             $ref: '../components.yaml#/schemas/Motion'
 
-    put:
-      summary: Update an existing posture for a motion
-      parameters:
-        - in: path
-          name: motionId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: postureId
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '../components.yaml#/schemas/Posture'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '../components.yaml#/schemas/Posture'
-    delete:
-      summary: Delete an existing posture for a motion
-      parameters:
-        - in: path
-          name: motionId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: postureId
-          required: true
-          schema:
-            type: string
-      responses:
-        204:
-          description: No content
+    
