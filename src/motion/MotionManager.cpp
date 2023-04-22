@@ -3,9 +3,9 @@
 #include <FS.h>
 #include <SPIFFS.h>
 
-#include "MotionManager.h"
+#include "Motion.h"
 
-MotionManager::MotionManager() {}
+MotionManager::MotionManager() : m_pCurrentMotion(NULL) {}
 // Store all motions to file
 void MotionManager::storeMotions() {
    File file = SPIFFS.open("motions.bin", "w");
@@ -48,7 +48,7 @@ void MotionManager::loadMotions() {
    m_allMotions.clear();
 
    for (JsonObject motionJson : motionsArray) {
-      Motion motion(motionJson);
-      m_allMotions.emplace_back(motion);
+      // Motion motion(motionJson);
+      m_allMotions.emplace_back(motionJson);
    }
 }

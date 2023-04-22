@@ -1,5 +1,5 @@
-#ifndef API_CONFIG_H
-#define API_CONFIG_H
+#ifndef API_MOTION_H
+#define API_MOTION_H
 #include <ESPAsyncWebServer.h>
 
 #include "../motion/MotionManager.h"
@@ -8,4 +8,4 @@
 // setup function gets server as parameter and a pointer to the outputs struct
 void setupApiMotion(AsyncWebServer *server_p, MotionManager *motionManager_p);
 
-#endif  // API_CONFIG
+#endif  // API_MOTION

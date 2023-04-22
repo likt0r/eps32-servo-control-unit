@@ -19,12 +19,12 @@ class MotionManager {
 
    // Public getter methods
    const std::vector<Motion>& getAllMotions() const { return m_allMotions; }
-   const Motion& getCurrentMotion() const { return m_currentMotion; }
+   const Motion* getCurrentMotion() const { return m_pCurrentMotion; }
 
   private:
    // Member variables
    std::vector<Motion> m_allMotions;
-   Motion m_currentMotion;
+   Motion* m_pCurrentMotion;
 };
 
 #endif  // MOTION_MANAGER_H
