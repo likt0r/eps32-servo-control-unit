@@ -17,7 +17,6 @@ post:
     content:
       application/json:
         schema:
-          type: object
           $ref: '../components.yaml#/schemas/MotionSpeed'
   responses:
     '204':
@@ -27,4 +26,4 @@ post:
       content:
         application/json:
           schema:
-              $ref: '../components.yaml#/schemas/Error'
+              $ref: '../components.yaml#/schemas/ServerError'

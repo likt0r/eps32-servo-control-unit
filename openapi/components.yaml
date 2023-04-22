@@ -23,7 +23,7 @@ schemas:
       isOn:
         type: boolean
         description: State of Led on/off
-  Error:
+  ServerError:
     type: object
     required:
       - error
@@ -97,6 +97,7 @@ schemas:
         description: List of all Servos
   ServoPosition:
     type: object
+    title: servoPosition
     required: 
       - id
       - position
@@ -108,6 +109,7 @@ schemas:
         type: number
         description: Target position of the servos in degree
   MotionSpeed:
+    title: motionSpeed
     type: object
     required: true
     properties:

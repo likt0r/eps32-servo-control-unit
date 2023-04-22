@@ -32,7 +32,7 @@ void setupApiConfig(AsyncWebServer *server_p, PinOutputs *outputs_p,
                    request->send(200, "text/plain", "");
                 });
    server_p->addHandler(new AsyncCallbackJsonWebHandler(
-       "/api/config/config/wifi/credentials",
+       "/api/config/wifi/credentials",
        [wifiManager_p](AsyncWebServerRequest *request, JsonVariant &json) {
           Serial.println("POST /api/wifi/credentials");
           JsonArray const &payload = json.as<JsonArray>();

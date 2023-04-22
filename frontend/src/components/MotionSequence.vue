@@ -1,15 +1,12 @@
 <script lang="ts" setup>
 import { reactive, toRefs } from "vue";
-import { MotionSequence } from "@/Api";
-const props = defineProps<{
-   sequence: MotionSequence;
-}>();
-const { sequence } = toRefs(props);
+// i;
+// conpm
 </script>
 
 <template>
    <v-sheet border rounded>
-      <v-row
+      <!-- <v-row
          ><v-col cols="12" sm="6" md="4">
             <v-text-field
                v-model="sequence.name"
@@ -30,6 +27,6 @@ const { sequence } = toRefs(props);
       <v-sheet border rounded>
          lala
          <v-row> </v-row>
-      </v-sheet>
+      </v-sheet> -->
    </v-sheet>
 </template>

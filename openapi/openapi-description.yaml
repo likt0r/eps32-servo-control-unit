@@ -5,6 +5,7 @@ info:
   description: An API to manage WiFi credentials
   version: 1.0.0
 servers:
+  - url: '//'
   - url: 'http://192.168.0.93/'
   - url: 'http://192.168.4.1/'
   - url: 'http://192.168.178.181/'
@@ -30,8 +31,8 @@ paths:
     $ref: 'paths/remote-mode.yaml'
   /api/motion/:
     $ref: 'paths/motion.yaml'  
-  /api/motion/{motionId}:
-    $ref: 'paths/motion-[id].yaml'  
+  # /api/motion/{motionId}:
+  #   $ref: 'paths/motion-[id].yaml'  
   # # /api/motion/{motionId}/posture':
   # #   $ref: 'paths/motion-[id]-posture.yaml'
   # # /api/motion/{motionId}/posture/{postureId}':

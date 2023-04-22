@@ -1,6 +1,6 @@
-
 get:
   summary: Get motion by ID
+  operationId: getMotion
   parameters:
     - in: path
       name: motionId
@@ -21,12 +21,13 @@ get:
       description: Internal server error
 post:
   summary: Update an existing motion
+  operationId: setMotion
   parameters:
     - in: path
       name: motionId
-      required: true
       schema:
         type: string
+      required: true
   requestBody:
     required: true
     content:
@@ -46,12 +47,13 @@ post:
       description: Internal server error
 delete:
   summary: Delete an existing motion
+  operationId: deleteMotion
   parameters:
     - in: path
       name: motionId
-      required: true
       schema:
         type: string
+      required: true
   responses:
     204:
       description: No content

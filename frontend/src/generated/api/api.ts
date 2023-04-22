@@ -70,15 +70,39 @@ export interface LedStatus {
 /**
  * 
  * @export
- * @interface ModelError
+ * @interface Motion
  */
-export interface ModelError {
+export interface Motion {
     /**
-     * Error message
+     * 
      * @type {string}
-     * @memberof ModelError
+     * @memberof Motion
      */
-    'error': string;
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Motion
+     */
+    'id': string;
+    /**
+     * 
+     * @type {Array<Posture>}
+     * @memberof Motion
+     */
+    'postures': Array<Posture>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Motion
+     */
+    'loop': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof Motion
+     */
+    'speedMultiplier': number;
 }
 /**
  * 
@@ -114,6 +138,75 @@ export interface MotionSpeed {
      * @memberof MotionSpeed
      */
     'speed'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface Posture
+ */
+export interface Posture {
+    /**
+     * 
+     * @type {string}
+     * @memberof Posture
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Posture
+     */
+    'id': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Posture
+     */
+    'transitionDuration': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Posture
+     */
+    'pauseDuration': number;
+    /**
+     * 
+     * @type {Array<PostureTargetPositionsInner>}
+     * @memberof Posture
+     */
+    'targetPositions': Array<PostureTargetPositionsInner>;
+}
+/**
+ * 
+ * @export
+ * @interface PostureTargetPositionsInner
+ */
+export interface PostureTargetPositionsInner {
+    /**
+     * 
+     * @type {number}
+     * @memberof PostureTargetPositionsInner
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PostureTargetPositionsInner
+     */
+    'position'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface ServerError
+ */
+export interface ServerError {
+    /**
+     * Error message
+     * @type {string}
+     * @memberof ServerError
+     */
+    'error': string;
 }
 /**
  * 
@@ -230,6 +323,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
+         * @summary Create a new motions
+         * @param {Motion} motion 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createMotion: async (motion: Motion, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'motion' is not null or undefined
+            assertParamExists('createMotion', 'motion', motion)
+            const localVarPath = `/api/motion/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(motion, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary List all Leds
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -296,6 +425,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         getMotionSpeed: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/remote/speed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary List all motions
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMotions: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/motion/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -672,6 +831,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Create a new motions
+         * @param {Motion} motion 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createMotion(motion: Motion, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Motion>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createMotion(motion, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary List all Leds
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -698,6 +868,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async getMotionSpeed(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMotionSpeed(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary List all motions
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMotions(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Motion>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMotions(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -819,6 +999,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Create a new motions
+         * @param {Motion} motion 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createMotion(motion: Motion, options?: any): AxiosPromise<Motion> {
+            return localVarFp.createMotion(motion, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary List all Leds
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -843,6 +1033,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getMotionSpeed(options?: any): AxiosPromise<string> {
             return localVarFp.getMotionSpeed(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List all motions
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMotions(options?: any): AxiosPromise<Array<Motion>> {
+            return localVarFp.getMotions(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -953,6 +1152,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
+     * @summary Create a new motions
+     * @param {Motion} motion 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public createMotion(motion: Motion, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createMotion(motion, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary List all Leds
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -982,6 +1193,17 @@ export class DefaultApi extends BaseAPI {
      */
     public getMotionSpeed(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getMotionSpeed(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List all motions
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getMotions(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getMotions(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,6 +1,7 @@
 
 get:
   summary: List all motions
+  operationId: getMotions
   responses:
     200:
       description: OK
@@ -12,7 +13,9 @@ get:
               $ref: '../components.yaml#/schemas/Motion'
 post:
   summary: Create a new motions
+  operationId: createMotion
   requestBody:
+    name: MotionBody
     required: true
     content:
       application/json:
